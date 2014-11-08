@@ -108,6 +108,9 @@ tToken getNextToken() {
             else if (c == ':') {
                 stav = s_dvojtecka;
             }
+            else if (c == '.') {
+                stav = s_tecka;
+            }
             else if (c == '+') {
                 stav = s_plus;
             }
@@ -335,9 +338,9 @@ tToken getNextToken() {
                 tokenChangeState(&token, stav);
             }
             else {
-                ungetc(c, f);
-                stav = s_lex_error;
+                stav = s_dvojtecka;
                 tokenChangeState(&token, stav);
+                ungetc(c, f);
                 return token;
             }
             break;
@@ -483,6 +486,7 @@ tToken getNextToken() {
         case s_rovno:
         case s_strednik:
         case s_carka:
+        case s_tecka:
         case s_leva_zavorka:
         case s_prava_zavorka:
             ungetc(c, f);

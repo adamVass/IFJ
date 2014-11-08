@@ -11,19 +11,18 @@
 #include "precedencni_analyza.h"
 #include "navratova_hodnota.h"
 
-#define INTERNI_CHYBA 99
-
 int main (int argc, char *argv[]) {
 
     /** Osetreni vstupnich parametru */
     if (argc != 2) {
         fprintf(stderr,"Byly spatne zadany parametry.\n");
-        return INTERNI_CHYBA;
+        return S_INTERNI_CHYBA;
     }
     /** Otevreni zdrojoveho souboru */
     FILE *f;
     if ((f = fopen(argv[1], "r")) == NULL) {
         fprintf(stderr, "Soubor nejde otevrit\n");
+        return S_INTERNI_CHYBA;
     }
 	setSourceFile(f);
 
