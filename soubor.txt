@@ -1,4 +1,0 @@
-var ahoj : integer; 
-    kokote : integer; 
-begin 
-end.
