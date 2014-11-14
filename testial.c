@@ -1,7 +1,7 @@
 
 /* ************************ s016-test.c **************************** */
 
-#include "c016.h"
+#include "ial.h"
 
 #include <stdio.h>
 #include <math.h>
