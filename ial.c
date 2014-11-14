@@ -38,7 +38,7 @@
 ** je přidán obsah - reálné číslo.
 */
 
-#include "c016.h"
+#include "ial.h"
 
 int HTSIZE = MAX_HTSIZE;
 
