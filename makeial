@@ -1,0 +1,15 @@
+
+PRJ=ial
+#
+PROGS=testial
+CC=gcc
+CFLAGS=-Wall -std=c99 -pedantic -lm
+
+all: $(PROGS)
+
+testial: $(PRJ).c testial.c
+	$(CC) $(CFLAGS) -o $@ $(PRJ).c testial.c
+
+clean:
+	rm -f *.o *.out $(PROGS)
+#
