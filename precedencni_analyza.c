@@ -7,7 +7,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "scanner.h"
 #include "navratova_hodnota.h"
 #include "precedencni_analyza.h"
 
@@ -121,6 +120,8 @@ int prevedToken(tToken token) {
     else if (token.stav == s_desetinne_cislo)
         return ID;
     else if (token.stav == s_strednik)
+        return DOLAR;
+    else if (token.stav == s_klicove && (!strcmp(token.data, "then") || !strcmp(token.data, "do")))
         return DOLAR;
     //pridat jeste klicova slova, jako true a false apod.
     else

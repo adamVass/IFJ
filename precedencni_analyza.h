@@ -6,6 +6,7 @@
 /****************************************/
 
 #include <stdbool.h>
+#include "scanner.h"
 
 /** Enumy pro vyplneni precedencni tabulky */
 typedef enum {
