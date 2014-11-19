@@ -436,7 +436,7 @@ tToken getNextToken() {
             else {                                  /** Neni escape sekvence ale konec retezce */
                 ungetc(c, f);                       /** Je nutne vratit jeden znak */
                 stav = s_string;
-                tokenEdit(&token, c);
+                //tokenEdit(&token, c);
                 tokenChangeState(&token, stav);
                 return token;
             }

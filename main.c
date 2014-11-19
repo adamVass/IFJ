@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include "precedencni_analyza.h"
 #include "navratova_hodnota.h"
+#include "syntakticka_analyza.h"
 
 int main (int argc, char *argv[]) {
 
@@ -34,12 +35,19 @@ int main (int argc, char *argv[]) {
         printf("%d:\t%s\n", navrat.stav, navrat.data);
     }*/
 
-    int navrat;
+    /*int navrat;
     navrat = precedencniSA();
     if (navrat == S_BEZ_CHYB)
         printf("Syntakticka analyza OK\n");
     else
-        printf("Syntakticka analyza NO\n");
+        printf("Syntakticka analyza NO\n");*/
 
+    int navrat;
+    navrat = syntakticka_anal();
+    if(navrat == S_BEZ_CHYB)
+        printf("SYN OK\n");
+    else
+        printf("SYN NO\n");
     return 0;
+
 }
