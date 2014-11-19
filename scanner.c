@@ -76,12 +76,17 @@ int checkKeyWords(char *s) {
     return s_identifikator;
 }
 
+void tokenClear(tToken *s) {
+   s->data[0] = '\0';
+   s->delka = 0;
+}
+
 tToken getNextToken() {
     int c, pom, cislo;
     int stav = s_start;
 
     /** Vymazeme obsah tokenu a v pripade retezce jej budeme ukladat */
-    tokenInit(&token);
+    tokenClear(&token);
 
     while (1) {
     c = getc(f);

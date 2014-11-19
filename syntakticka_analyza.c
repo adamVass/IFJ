@@ -820,13 +820,14 @@ tChyba TERM() {
 
 int syntakticka_anal() {		//pomocna funkce pro kontrolu cele syntakticke analyzy v main.c souboru
 	int navrat;
+	tokenInit(&token);
 	token = getNextToken();
 	if(token.stav == s_lex_error) {
 		navrat = S_LEXIKALNI_CHYBA;
 	}
 	else
 	navrat = PROGRAM();
-
+    tokenFree(&token);
 	return navrat;
 }
 

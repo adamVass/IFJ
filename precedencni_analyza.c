@@ -308,8 +308,6 @@ int precedencniSA() {
         if (precti == 1) {
             token = getNextToken();
             prevedenyToken = prevedToken(token);
-            /** Uvolnime token */
-            tokenFree(&token);
         }
 
         /** Je taky potreba najit nejvrchnejsi terminalni symbol na zasobniku: b */
