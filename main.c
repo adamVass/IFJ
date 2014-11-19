@@ -7,7 +7,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "scanner.h"
 #include "precedencni_analyza.h"
 #include "navratova_hodnota.h"
 

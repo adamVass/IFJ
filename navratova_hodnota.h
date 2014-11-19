@@ -17,7 +17,8 @@ typedef enum {
     S_NEINICIALIZOVANA_PROMENNA,/** 07. */
     S_DELENI_NULOU,             /** 08. */
     S_BEHOVA_CHYBA_OSTATNI,     /** 09. */
-    S_INTERNI_CHYBA = 99        /** 99. */
+    S_INTERNI_CHYBA = 99,       /** 99. */
+    S_EPS
 } tChyba;
 
 /** Globalni promenna pro navratovy kod */
