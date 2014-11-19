@@ -122,7 +122,7 @@ int prevedToken(tToken token) {
         return ID;
     else if (token.stav == s_strednik)
         return DOLAR;
-    else if (token.stav == s_klicove && (!strcmp(token.data, "then") || !strcmp(token.data, "do")))
+    else if (token.stav == s_klicove && (!strcmp(token.data, "then") || !strcmp(token.data, "do") || !strcmp(token.data, "end")))
         return DOLAR;
     //pridat jeste klicova slova, jako true a false apod.
     else
