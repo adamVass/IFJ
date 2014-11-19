@@ -69,6 +69,9 @@ tToken getNextToken();
 /** Funkce vytvori novy retezec/token */
 int tokenInit(tToken *s);
 
+/** Funkce vymaze obsah tokenu */
+void tokenClear(tToken *s);
+
 /** Funkce uvolni retezec/token z pameti */
 void tokenFree(tToken *s);
 
