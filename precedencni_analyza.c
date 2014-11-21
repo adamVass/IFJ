@@ -304,11 +304,10 @@ int precedencniSA() {
 
     /** Dokud aktualni vstupni symbol a nejvrchnejsi terminalni symbol neni dolar, proved dalsi smycku */
     while (!((prevedenyToken == DOLAR) && (nejvrchTermSymbol.symbol == DOLAR))) {
-        /** Nacteme token a prevedeme na terminalni symbol: a */
-        if (precti == 1) {
-            token = getNextToken();
-            prevedenyToken = prevedToken(token);
-        }
+
+        /** Prvni token dostaneme od SA rekurzivniho sestupu */
+        prevedenyToken = prevedToken(token);
+
 
         /** Je taky potreba najit nejvrchnejsi terminalni symbol na zasobniku: b */
         presypZasobnikyPoTerminal(&zasobnik1, &zasobnik2);
@@ -356,6 +355,12 @@ int precedencniSA() {
             while (!zasobnikEmpty(&zasobnik2))
                 zasobnikPop(&zasobnik2);
             return S_SYNTAKTICKA_CHYBA;
+        }
+
+        /** Nacteme token a prevedeme na terminalni symbol: a */
+        if (precti == 1) {
+            token = getNextToken();
+            prevedenyToken = prevedToken(token);
         }
     }
 

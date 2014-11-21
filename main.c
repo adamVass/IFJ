@@ -36,6 +36,8 @@ int main (int argc, char *argv[]) {
     }*/
 
     /*int navrat;
+    tokenInit(&token);
+    token = getNextToken();
     navrat = precedencniSA();
     if (navrat == S_BEZ_CHYB)
         printf("Syntakticka analyza OK\n");
