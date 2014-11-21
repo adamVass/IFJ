@@ -286,7 +286,6 @@ int precedencniSA() {
     tData dolar;
     tPrecTabulka akce;
     tData pomocna;
-    tToken token;
     tData terminal;
     int prevedenyToken;
     tData nejvrchTermSymbol;
@@ -306,8 +305,9 @@ int precedencniSA() {
     while (!((prevedenyToken == DOLAR) && (nejvrchTermSymbol.symbol == DOLAR))) {
 
         /** Prvni token dostaneme od SA rekurzivniho sestupu */
-        prevedenyToken = prevedToken(token);
-
+        if (precti == 1) {
+            prevedenyToken = prevedToken(token);
+        }
 
         /** Je taky potreba najit nejvrchnejsi terminalni symbol na zasobniku: b */
         presypZasobnikyPoTerminal(&zasobnik1, &zasobnik2);
@@ -360,7 +360,6 @@ int precedencniSA() {
         /** Nacteme token a prevedeme na terminalni symbol: a */
         if (precti == 1) {
             token = getNextToken();
-            prevedenyToken = prevedToken(token);
         }
     }
 
