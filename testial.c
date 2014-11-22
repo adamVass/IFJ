@@ -8,11 +8,8 @@
 #include <stdlib.h>
 
 
-TItem* UNDEFPTR;
-tHTable* ptrht;
-
 //vytiskne tabulku
-void htPrintTable( tHTable* ptrht ) {
+void htPrintTable() {
 	int maxlen = 0;
 	int sumcnt = 0;
 	
@@ -54,12 +51,8 @@ void htPrintTable( tHTable* ptrht ) {
 
 /* Hlavni funkce pro testovani */
 int main(int argc, char* argv[] ) {
-	UNDEFPTR = (TItem*) malloc ( sizeof(tHTable) );
-	UNDEFPTR->key = "*UNDEF*";
-	UNDEFPTR->type = TYPEUNDEF;
-	UNDEFPTR->ptrnext = NULL;
-	ptrht = (tHTable*) malloc ( sizeof(tHTable) );
-	for ( int i=0; i<MAX_HTSIZE; (*ptrht)[i++] = UNDEFPTR );  // undef item asi jako zarazka
+	
+	htInit();
 
 /********************* SCRIPT START ******************************************/
 
@@ -68,25 +61,25 @@ int main(int argc, char* argv[] ) {
 	TData stringik = { .str = "holyfnuk" };
 	TData doublik = { .floatNumber = 5.5 };
 
-	htInsert( ptrht, "intik", intik, TYPEINT);
-	htInsert( ptrht, "stringik", stringik, TYPESTR);
-	htInsert( ptrht, "doublik", doublik, TYPEDOUBLE);
+	htInsert( "intik", intik, TYPEINT);
+	htInsert( "stringik", stringik, TYPESTR);
+	htInsert( "doublik", doublik, TYPEDOUBLE);
 
 	// vytiskne table
 	htPrintTable( ptrht );
 
 	// hledani stringiku
 	TItem *find = NULL;
-	find = htSearch ( ptrht, "stringik" );
+	find = htSearch ( "stringik" );
 	if( find ){
 		printf("Stringik nalezen: %s\n", find->data.str);
 	}
 	printf("Mazam stringik\n");
-	htDelete( ptrht, "stringik" );
+	htDelete( "stringik" );
 
 	// hledani stringiku
 	find = NULL;
-	find = htSearch ( ptrht, "stringik" );
+	find = htSearch ( "stringik" );
 	if( !find ){
 		printf("Stringik nenalezen:((((\n");
 	}
