@@ -33,22 +33,18 @@ tZahlavi precedencniTabulka [VELIKOST_TABULKY][VELIKOST_TABULKY] = {
 
 int counterVar = 1;
 
+/** Generuje jedinecne nazvy identifikatoru. Nazev se sklada ze znaku $, ktery nasleduje cislo.
+    Postupne se tu generuji prirozena cisla a do nazvu promenne se ukladaji v reverzovanem poradi. */
 void generateVariable(tToken *var) {
-// generuje jedinecne nazvy identifikatoru
-// nazev se sklada ze znaku $ nasledovanym cislem
-// postupne se tu generuji prirozena cisla a do nazvu promenne se ukladaji
-// v reverzovanem poradi - na funkcnost to nema vliv, ale je jednodussi implementace
-
-  tokenClear(var);
-  tokenEdit(var, '$');
-  int i;
-  i = counterVar;
-  while (i != 0)
-  {
-    tokenEdit(var, (char)(i % 10 + '0'));
-    i = i / 10;
-  }
-  counterVar ++;
+    tokenClear(var);
+    tokenEdit(var, '$');
+    int i;
+    i = counterVar;
+    while (i != 0) {
+        tokenEdit(var, (char)(i % 10 + '0'));
+        i = i / 10;
+    }
+    counterVar ++;
 }
 
 void zasobnikInit(tZasobnik *zasobnik) {
@@ -137,9 +133,17 @@ int prevedToken(tToken token) {
     else if (token.stav == s_nerovno)
         return NEROVNO;
     else if (token.stav == s_logicka_hodnota) {
+    // **************************************************************************************
+        tToken newVar;
+        tokenInit(&newVar);
+        generateVariable(&newVar);
+        //printf("data: %s\n", newVar.data);
+        /** zde bude vlozeni do tabulky symbolu */
+        tokenFree(&newVar);
         return ID;
     }
     else if (token.stav == s_string) {
+    // **************************************************************************************
         tToken newVar;
         tokenInit(&newVar);
         generateVariable(&newVar);
