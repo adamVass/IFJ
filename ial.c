@@ -76,7 +76,7 @@ void htInit () {
 
 /* TRP s explicitně zřetězenými synonymy.
 ** Vyhledání prvku v TRP ptrht podle zadaného klíče key.  Pokud je
-** daný prvek nalezen, vrací se ukazatel na daný prvek. Pokud prvek nalezen není, 
+** daný prvek nalezen, vrací se ukazatel na daný prvek. Pokud prvek nalezen není,
 ** vrací se hodnota NULL.
 **
 */
@@ -98,7 +98,7 @@ TItem* htSearch ( char *key ) {
 	return NULL;
 }
 
-/* 
+/*
 ** TRP s explicitně zřetězenými synonymy.
 ** Tato procedura vkládá do tabulky ptrht položku s klíčem key a s daty
 ** data.  Protože jde o vyhledávací tabulku, nemůže být prvek se stejným
@@ -110,7 +110,7 @@ TItem* htSearch ( char *key ) {
 ** tedy proveďte.vložení prvku na začátek seznamu.
 **/
 
-void htInsert ( char *key, TData data, int type ) {
+void htInsert ( char *key, TData data, int type, int druh ) {
 
 	if( !ptrht || !key ){
 		return;
@@ -129,6 +129,7 @@ void htInsert ( char *key, TData data, int type ) {
 		strcpy(new->key, key);
 		new->data = data;
 		new->type = type;
+		new->druh = druh;
 		int hashKey = hashCode(key);
 		new->ptrnext = (*ptrht)[hashKey];
 		(*ptrht)[hashKey] = new;

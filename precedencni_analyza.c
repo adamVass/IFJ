@@ -164,6 +164,7 @@ int prevedToken(tToken token, tData *prevedenyToken) {
         strcpy(prevedenyToken->polozkaTS.key, newVar.data);
         prevedenyToken->symbol = ID;
         prevedenyToken->polozkaTS.type = ID;
+        prevedenyToken->polozkaTS.druh = 0;
         prevedenyToken->polozkaTS.data.intNumber = atoi(token.data);
 
         //printf("TS KEY: %s\n", prevedenyToken->polozkaTS.key);
@@ -171,7 +172,7 @@ int prevedToken(tToken token, tData *prevedenyToken) {
         //printf("TS TYPE: %d\n", prevedenyToken->polozkaTS.type);
 
         // nejde vlozit
-        htInsert(prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type);
+        htInsert(prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
 
         // jde vlozit
         //htInsert("$3", (prevedenyToken->polozkaTS.data), (prevedenyToken->polozkaTS.type));

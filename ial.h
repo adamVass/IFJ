@@ -47,6 +47,7 @@ typedef union TData{
    char *key;            /* klíč  */
    TData data;          /* obsah */
    int type;
+   int druh;
    struct TItem* ptrnext;  /* ukazatel na další synonymum */
 } TItem;
 
@@ -61,7 +62,7 @@ tHTable* ptrht;
    pole o rozměru MAX_HTSIZE, ale při implementaci vašich procedur uvažujte
    velikost HTSIZE.  Ve skriptu se před voláním řešených procedur musí
    objevit příkaz HTSIZE N, kde N je velikost požadovaného prostoru.
-   
+
    POZOR! Pro správnou funkci TRP musí být hodnota této proměnné prvočíslem.
 */
 extern int HTSIZE;
@@ -74,7 +75,7 @@ void htInit ();
 
 TItem* htSearch ( char *key );
 
-void htInsert ( char *key, TData data, int type );
+void htInsert ( char *key, TData data, int type, int druh );
 
 TData* htRead ( char *key );
 
