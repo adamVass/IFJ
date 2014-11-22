@@ -31,6 +31,26 @@ tZahlavi precedencniTabulka [VELIKOST_TABULKY][VELIKOST_TABULKY] = {
     /** $  */  {M,  M,  M,  M,  M,  M,  E,  M,  M,  M,  M,  M,  M,  E},
 };
 
+int counterVar = 1;
+
+void generateVariable(tToken *var) {
+// generuje jedinecne nazvy identifikatoru
+// nazev se sklada ze znaku $ nasledovanym cislem
+// postupne se tu generuji prirozena cisla a do nazvu promenne se ukladaji
+// v reverzovanem poradi - na funkcnost to nema vliv, ale je jednodussi implementace
+
+  tokenClear(var);
+  tokenEdit(var, '$');
+  int i;
+  i = counterVar;
+  while (i != 0)
+  {
+    tokenEdit(var, (char)(i % 10 + '0'));
+    i = i / 10;
+  }
+  counterVar ++;
+}
+
 void zasobnikInit(tZasobnik *zasobnik) {
     zasobnik->vrchol = NULL;
 }
@@ -116,10 +136,35 @@ int prevedToken(tToken token) {
         return ROVNO;
     else if (token.stav == s_nerovno)
         return NEROVNO;
-    else if (token.stav == s_cele_cislo)
+    else if (token.stav == s_logicka_hodnota) {
         return ID;
-    else if (token.stav == s_desetinne_cislo)
+    }
+    else if (token.stav == s_string) {
+        tToken newVar;
+        tokenInit(&newVar);
+        generateVariable(&newVar);
+        //printf("data: %s\n", newVar.data);
+        tokenFree(&newVar);
         return ID;
+    }
+    else if (token.stav == s_cele_cislo) {
+	// **************************************************************************************
+        tToken newVar;
+        tokenInit(&newVar);
+        generateVariable(&newVar);
+        //printf("data: %s\n", newVar.data);
+        tokenFree(&newVar);
+        return ID;
+	}
+    else if (token.stav == s_desetinne_cislo) {
+	// **************************************************************************************
+        tToken newVar;
+        tokenInit(&newVar);
+        generateVariable(&newVar);
+        //printf("data: %s\n", newVar.data);
+        tokenFree(&newVar);
+        return ID;
+	}
     else if (token.stav == s_strednik)
         return DOLAR;
     else if (token.stav == s_klicove && (!strcmp(token.data, "then") || !strcmp(token.data, "do") || !strcmp(token.data, "end")))
