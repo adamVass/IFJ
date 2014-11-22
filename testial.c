@@ -32,8 +32,7 @@ void htPrintTable() {
 			else if( ptr->type == 3 ){		// double
 				printf(" %f", ptr->data.floatNumber);
 			}
-			if ( ptr != UNDEFPTR )
-				cnt++;
+			cnt++;
 			ptr = ptr->ptrnext;
 		}
 		printf ("\n");
@@ -84,7 +83,6 @@ int main(int argc, char* argv[] ) {
 		printf("Stringik nenalezen:((((\n");
 	}
 
-	free ( UNDEFPTR );
 	free ( ptrht );
 	
 	return 0;	
