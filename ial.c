@@ -90,7 +90,7 @@ TItem* htSearch ( char *key ) {
 	TItem *tmp = (*ptrht)[hashCode(key)];
 	while( tmp ){
 		//klíč je nalezen
-		if( tmp->key == key ){
+		if(!strcmp( tmp->key, key )){
 			return tmp;
 		}
 		tmp = tmp->ptrnext;
@@ -125,7 +125,8 @@ void htInsert ( char *key, TData data, int type ) {
 	//prvek nebyl nalezen, musí být vytvořen
 	else{
 		TItem *new = (TItem*)malloc(sizeof(struct TItem));
-		new->key = key;
+		new->key = malloc(strlen(key)+1);
+		strcpy(new->key, key);
 		new->data = data;
 		new->type = type;
 		int hashKey = hashCode(key);

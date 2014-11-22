@@ -31,6 +31,7 @@ tZahlavi precedencniTabulka [VELIKOST_TABULKY][VELIKOST_TABULKY] = {
     /** $  */  {M,  M,  M,  M,  M,  M,  E,  M,  M,  M,  M,  M,  M,  E},
 };
 
+/** Globalni promenne */
 int counterVar = 1;
 
 /** Generuje jedinecne nazvy identifikatoru. Nazev se sklada ze znaku $, ktery nasleduje cislo.
@@ -105,7 +106,7 @@ void presypZasobnikZpet(tZasobnik *zasobnik2, tZasobnik *zasobnik1) {
     }
 }
 
-int prevedToken(tToken token) {
+int prevedToken(tToken token, tData *prevedenyToken) {
     if (token.stav == s_plus)
         return PLUS;
     else if (token.stav == s_minus)
@@ -157,6 +158,26 @@ int prevedToken(tToken token) {
         tokenInit(&newVar);
         generateVariable(&newVar);
         //printf("data: %s\n", newVar.data);
+
+        /** Naplneni struktury pro tabulku symbolu */
+        prevedenyToken->polozkaTS.key = malloc(sizeof(char)*16);    /** Alokace pameti pro klic */
+        strcpy(prevedenyToken->polozkaTS.key, newVar.data);
+        prevedenyToken->symbol = ID;
+        prevedenyToken->polozkaTS.type = ID;
+        prevedenyToken->polozkaTS.data.intNumber = atoi(token.data);
+
+        //printf("TS KEY: %s\n", prevedenyToken->polozkaTS.key);
+        //printf("TS DATA.intNumber: %d\n", prevedenyToken->polozkaTS.data.intNumber);
+        //printf("TS TYPE: %d\n", prevedenyToken->polozkaTS.type);
+
+        // nejde vlozit
+        htInsert(prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type);
+
+        // jde vlozit
+        //htInsert("$3", (prevedenyToken->polozkaTS.data), (prevedenyToken->polozkaTS.type));
+
+        /** Uvolneni klicu */
+        free(prevedenyToken->polozkaTS.key);
         tokenFree(&newVar);
         return ID;
 	}
@@ -336,6 +357,7 @@ int precedencniSA() {
     tPrecTabulka akce;
     tData pomocna;
     tData terminal;
+    tData prevedenyToken2;
     int prevedenyToken;
     tData nejvrchTermSymbol;
     tData zarazka;
@@ -355,7 +377,7 @@ int precedencniSA() {
 
         /** Prvni token dostaneme od SA rekurzivniho sestupu */
         if (precti == 1) {
-            prevedenyToken = prevedToken(token);
+            prevedenyToken = prevedToken(token, &prevedenyToken2);
         }
 
         /** Je taky potreba najit nejvrchnejsi terminalni symbol na zasobniku: b */

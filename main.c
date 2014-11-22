@@ -9,7 +9,46 @@
 #include <stdlib.h>
 #include "precedencni_analyza.h"
 #include "navratova_hodnota.h"
-#include "syntakticka_analyza.h"
+//#include "syntakticka_analyza.h"
+
+TItem* UNDEFPTR;
+
+void htPrintTable() {
+int maxlen = 0;
+int sumcnt = 0;
+printf ("------------HASH TABLE--------------\n");
+for ( int i=0; i<HTSIZE; i++ ) {
+printf ("%i:",i);
+int cnt = 0;
+TItem* ptr = (*ptrht)[i];
+while ( ptr != NULL ) {
+printf (" (%s)",ptr->key); // vytiskne klic
+if( ptr->type == 0 ){ // string
+printf(" %s", ptr->data.str);
+}
+else if( ptr->type == 1 ){ // bool
+printf(" %d", ptr->data.boolValue);
+}
+else if( ptr->type == 2 ){ // int
+printf(" %d", ptr->data.intNumber);
+}
+else if( ptr->type == 3 ){ // double
+printf(" %f", ptr->data.floatNumber);
+}
+if ( ptr != UNDEFPTR )
+cnt++;
+ptr = ptr->ptrnext;
+}
+printf ("\n");
+if (cnt > maxlen)
+maxlen = cnt;
+sumcnt+=cnt;
+}
+printf ("------------------------------------\n");
+printf ("Items count %i The longest list %i\n",sumcnt,maxlen);
+printf ("------------------------------------\n");
+}
+
 
 int main (int argc, char *argv[]) {
 
@@ -36,8 +75,7 @@ int main (int argc, char *argv[]) {
     }*/
 
     /** Tabulka symbolu */
-    tHTable* ptrht;
-    htInit(ptrht);
+    htInit();
 
     int navrat;
     tokenInit(&token);
@@ -48,6 +86,17 @@ int main (int argc, char *argv[]) {
     else
         printf("Syntakticka analyza NO\n");
 
+    TItem* tmp = htSearch("$3");
+	if (tmp != NULL) {
+		printf("TS KEY: %s\n", tmp->key);
+        	printf("TS DATA.intNumber: %d\n", tmp->data.intNumber);
+        	printf("TS TYPE: %d\n", tmp->type);
+	}
+	else {
+		printf("neni v tabulce\n");
+	}
+
+    htPrintTable();
 
     /*int navrat;
     navrat = syntakticka_anal();

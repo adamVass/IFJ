@@ -42,7 +42,7 @@ typedef enum {
 /** Struktura uchovavajici data polozky zasobniku */
 typedef struct {
     tZahlavi symbol;
-    //tToken token;   // spis polozka tabulky symbolu, pro overovani semantiky apod
+    TItem polozkaTS;
 } tData;
 
 /** Struktura reprezentujici polozku zasobniku */
@@ -83,7 +83,7 @@ void presypZasobnikyPoTerminal(tZasobnik *zasobnik1, tZasobnik *zasobnik2);
 void presypZasobnikZpet(tZasobnik *zasobnik2, tZasobnik *zasobnik1);
 
 /** Funkce prevede token na terminal */
-int prevedToken(tToken token);
+int prevedToken(tToken token, tData *prevedenyToken);
 
 /** Funkce na overeni spravne funkcnosti zasobniku
     a precedencni tabulky */
