@@ -50,7 +50,7 @@ int HTSIZE = MAX_HTSIZE;
 ** volena s ohledem na maximální kvalitu výsledku). }
 */
 
-int hashCode ( TKey key ) {
+int hashCode ( char *key ) {
 	int retval = 1;
 	int keylen = strlen(key);
 	for ( int i=0; i<keylen; i++ )
@@ -63,8 +63,8 @@ int hashCode ( TKey key ) {
 ** se volá pouze před prvním použitím tabulky.
 */
 
-void htInit ( tHTable* ptrht ) {
-
+void htInit () {
+	ptrht = (tHTable*) malloc ( sizeof(tHTable) );
 	if( !ptrht ){
 		return;
 	}
@@ -81,7 +81,7 @@ void htInit ( tHTable* ptrht ) {
 **
 */
 
-TItem* htSearch ( tHTable* ptrht, TKey key ) {
+TItem* htSearch ( char *key ) {
 
 	if( !ptrht || !key ){
 		return NULL;
@@ -110,13 +110,13 @@ TItem* htSearch ( tHTable* ptrht, TKey key ) {
 ** tedy proveďte.vložení prvku na začátek seznamu.
 **/
 
-void htInsert ( tHTable* ptrht, TKey key, TData data, int type ) {
+void htInsert ( char *key, TData data, int type ) {
 
 	if( !ptrht || !key ){
 		return;
 	}
 	//hledani podle klice
-	TItem *tmp = htSearch( ptrht, key );
+	TItem *tmp = htSearch( key );
 	//prvek nalezen, aktualizace datové části
 	if( tmp ){
 		tmp->data = data;
@@ -143,13 +143,13 @@ void htInsert ( tHTable* ptrht, TKey key, TData data, int type ) {
 ** Využijte dříve vytvořenou funkci HTSearch.
 */
 
-TData* htRead ( tHTable* ptrht, TKey key ) {
+TData* htRead ( char *key ) {
 
 	if( !ptrht || !key ){
 		return NULL;
 	}
 
-	TItem *tmp = htSearch( ptrht, key );
+	TItem *tmp = htSearch( key );
 	if( !tmp ){
 		return NULL;
 	}
@@ -166,7 +166,7 @@ TData* htRead ( tHTable* ptrht, TKey key ) {
 ** V tomto případě NEVYUŽÍVEJTE dříve vytvořenou funkci HTSearch.
 */
 
-void htDelete ( tHTable* ptrht, TKey key ) {
+void htDelete ( char *key ) {
 
 	if( !ptrht || !key ){
 		return;
@@ -200,7 +200,7 @@ void htDelete ( tHTable* ptrht, TKey key ) {
 ** který tyto položky zabíraly, a uvede tabulku do počátečního stavu.
 */
 
-void htClearAll ( tHTable* ptrht ) {
+void htClearAll () {
 
 	if( !ptrht ){
 		return;
