@@ -35,21 +35,27 @@ int main (int argc, char *argv[]) {
         printf("%d:\t%s\n", navrat.stav, navrat.data);
     }*/
 
-    /*int navrat;
+    /** Tabulka symbolu */
+    tHTable* ptrht;
+    htInit(ptrht);
+
+    int navrat;
     tokenInit(&token);
     token = getNextToken();
     navrat = precedencniSA();
     if (navrat == S_BEZ_CHYB)
         printf("Syntakticka analyza OK\n");
     else
-        printf("Syntakticka analyza NO\n");*/
+        printf("Syntakticka analyza NO\n");
 
-    int navrat;
+
+    /*int navrat;
     navrat = syntakticka_anal();
     if(navrat == S_BEZ_CHYB)
         printf("SYN OK\n");
     else
-        printf("SYN NO\n");
-    return 0;
+        printf("SYN NO\n");*/
 
+
+    return 0;
 }

@@ -7,6 +7,7 @@
 
 #include <stdbool.h>
 #include "scanner.h"
+#include "ial.h"
 
 /** Enumy pro vyplneni precedencni tabulky */
 typedef enum {
