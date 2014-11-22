@@ -25,7 +25,7 @@
 
 // typ dat
 
-#define TYPESTR   0
+#define TYPESTR      0
 #define TYPEBOOL     1
 #define TYPEINT      2
 #define TYPEDOUBLE   3
@@ -33,9 +33,6 @@
 
 #define TYPEUNDEF    10
 
-
-/* typ klíče (například identifikace zboží) */
-typedef char* TKey;
 
 /* typ obsahu (například cena zboží) */
 typedef union TData{
@@ -47,14 +44,17 @@ typedef union TData{
 
 /*Datová položka TRP s explicitně řetězenými synonymy*/
  typedef struct TItem{
-	TKey key;				/* klíč  */
-	TData data;				/* obsah */
+   char *key;            /* klíč  */
+   TData data;          /* obsah */
    int type;
-	struct TItem* ptrnext;	/* ukazatel na další synonymum */
+   struct TItem* ptrnext;  /* ukazatel na další synonymum */
 } TItem;
 
 /* TRP s explicitně zřetězenými synonymy. */
 typedef TItem* tHTable[MAX_HTSIZE];
+
+/* Globalni promenna hash table */
+tHTable* ptrht;
 
 /* Pro účely testování je vhodné mít možnost volby velikosti pole,
    kterým je vyhledávací tabulka implementována. Fyzicky je deklarováno
@@ -68,18 +68,18 @@ extern int HTSIZE;
 
 /* Hlavičky řešených procedur a funkcí. */
 
-int hashCode ( TKey key );
+int hashCode ( char *key );
 
-void htInit ( tHTable* ptrht );
+void htInit ();
 
-TItem* htSearch ( tHTable* ptrht, TKey key );
+TItem* htSearch ( char *key );
 
-void htInsert ( tHTable* ptrht, TKey key, TData data, int type );
+void htInsert ( char *key, TData data, int type );
 
-TData* htRead ( tHTable* ptrht, TKey key );
+TData* htRead ( char *key );
 
-void htDelete ( tHTable* ptrht, TKey key );
+void htDelete ( char *key );
 
-void htClearAll ( tHTable* ptrht );
+void htClearAll ();
 
 #endif
