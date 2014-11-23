@@ -92,7 +92,7 @@ void vypisZasobnik(tZasobnik zasobnik);
 void vypisPrecedencniTabulku();
 
 /** Funkce provede redukci */
-int redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2);
+tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2);
 
 /** Funkce provede analyzu vyrazu */
-int precedencniSA();
+tChyba precedencniSA();

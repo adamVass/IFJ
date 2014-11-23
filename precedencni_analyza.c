@@ -116,8 +116,16 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
         prevedenyToken->symbol = DELENO;
     else if (token.stav == s_leva_zavorka)
         prevedenyToken->symbol = LZAVORKA;
-    else if (token.stav == s_identifikator)
+    else if (token.stav == s_identifikator) {
+
+        // zkontrolovat jestli se token.data nachazi v tabulce symbolu, jestli ne tak semanticka chyba
+        /*TItem *tmp = htSearch(token.data);
+        prevedenyToken->polozkaTS.type = tmp->type;
+        prevedenyToken->polozkaTS.ptrnext = tmp->ptrnext;
+        prevedenyToken->polozkaTS.druh = tmp->druh;*/
         prevedenyToken->symbol = ID;
+
+    }
     else if (token.stav == s_prava_zavorka)
         prevedenyToken->symbol = PZAVORKA;
     else if (token.stav == s_mensi)
@@ -207,7 +215,6 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
         prevedenyToken->symbol = DOLAR;
     else if (token.stav == s_klicove && (!strcmp(token.data, "then") || !strcmp(token.data, "do") || !strcmp(token.data, "end")))
         prevedenyToken->symbol = DOLAR;
-    //pridat jeste klicova slova, jako true a false apod.
     else {
         prevedenyToken->symbol = CHYBA;
         return S_SYNTAKTICKA_CHYBA;
@@ -216,7 +223,7 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
     return S_BEZ_CHYB;
 }
 
-int redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
+tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
     tData presyp;               /** Pomocna promenna na presunuti terminalu mezi zasobniky */
     tData neterminal;           /** Napr. E, budeme na nej redukovat */
     tData hledameZarazku;       /** Potrebujeme najit na zasobniku < */
@@ -367,7 +374,7 @@ int redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
     return 0;
 }
 
-int precedencniSA() {
+tChyba precedencniSA() {
     int precti = 1;
     tChyba navrat;
     tData dolar;
