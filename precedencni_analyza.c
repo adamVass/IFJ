@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "navratova_hodnota.h"
 #include "precedencni_analyza.h"
 
 #define VELIKOST_TABULKY 14
@@ -106,42 +105,54 @@ void presypZasobnikZpet(tZasobnik *zasobnik2, tZasobnik *zasobnik1) {
     }
 }
 
-int prevedToken(tToken token, tData *prevedenyToken) {
+tChyba prevedToken(tToken token, tData *prevedenyToken) {
     if (token.stav == s_plus)
-        return PLUS;
+        prevedenyToken->symbol = PLUS;
     else if (token.stav == s_minus)
-        return MINUS;
+        prevedenyToken->symbol = MINUS;
     else if (token.stav == s_krat)
-        return KRAT;
+        prevedenyToken->symbol = KRAT;
     else if (token.stav == s_deleno)
-        return DELENO;
+        prevedenyToken->symbol = DELENO;
     else if (token.stav == s_leva_zavorka)
-        return LZAVORKA;
+        prevedenyToken->symbol = LZAVORKA;
     else if (token.stav == s_identifikator)
-        return ID;
+        prevedenyToken->symbol = ID;
     else if (token.stav == s_prava_zavorka)
-        return PZAVORKA;
+        prevedenyToken->symbol = PZAVORKA;
     else if (token.stav == s_mensi)
-        return MENSI;
+        prevedenyToken->symbol = MENSI;
     else if (token.stav == s_vetsi)
-        return VETSI;
+        prevedenyToken->symbol = VETSI;
     else if (token.stav == s_mensi_rovno)
-        return MENSIROVNO;
+        prevedenyToken->symbol = MENSIROVNO;
     else if (token.stav == s_vetsi_rovno)
-        return VETSIROVNO;
+        prevedenyToken->symbol = VETSIROVNO;
     else if (token.stav == s_rovno)
-        return ROVNO;
+        prevedenyToken->symbol = ROVNO;
     else if (token.stav == s_nerovno)
-        return NEROVNO;
+        prevedenyToken->symbol = NEROVNO;
     else if (token.stav == s_logicka_hodnota) {
     // **************************************************************************************
         tToken newVar;
         tokenInit(&newVar);
         generateVariable(&newVar);
-        //printf("data: %s\n", newVar.data);
-        /** zde bude vlozeni do tabulky symbolu */
+
+        prevedenyToken->polozkaTS.key = malloc(sizeof(char)*16);    /** Alokace pameti pro klic */
+        strcpy(prevedenyToken->polozkaTS.key, newVar.data);
+        prevedenyToken->symbol = ID;
+        prevedenyToken->polozkaTS.type = TYPEBOOL;
+        prevedenyToken->polozkaTS.druh = 0;
+        if (!strcmp(token.data, "true"))
+            prevedenyToken->polozkaTS.data.boolValue = true;
+        else
+            prevedenyToken->polozkaTS.data.boolValue = false;
+
+        htInsert(prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
+
+        free(prevedenyToken->polozkaTS.key);
         tokenFree(&newVar);
-        return ID;
+        prevedenyToken->symbol = ID;
     }
     else if (token.stav == s_string) {
     // **************************************************************************************
@@ -150,54 +161,59 @@ int prevedToken(tToken token, tData *prevedenyToken) {
         generateVariable(&newVar);
         //printf("data: %s\n", newVar.data);
         tokenFree(&newVar);
-        return ID;
+        prevedenyToken->symbol = ID;
     }
     else if (token.stav == s_cele_cislo) {
 	// **************************************************************************************
         tToken newVar;
         tokenInit(&newVar);
         generateVariable(&newVar);
-        //printf("data: %s\n", newVar.data);
 
         /** Naplneni struktury pro tabulku symbolu */
         prevedenyToken->polozkaTS.key = malloc(sizeof(char)*16);    /** Alokace pameti pro klic */
         strcpy(prevedenyToken->polozkaTS.key, newVar.data);
         prevedenyToken->symbol = ID;
-        prevedenyToken->polozkaTS.type = ID;
+        prevedenyToken->polozkaTS.type = TYPEINT;
         prevedenyToken->polozkaTS.druh = 0;
         prevedenyToken->polozkaTS.data.intNumber = atoi(token.data);
 
-        //printf("TS KEY: %s\n", prevedenyToken->polozkaTS.key);
-        //printf("TS DATA.intNumber: %d\n", prevedenyToken->polozkaTS.data.intNumber);
-        //printf("TS TYPE: %d\n", prevedenyToken->polozkaTS.type);
-
-        // nejde vlozit
         htInsert(prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
-
-        // jde vlozit
-        //htInsert("$3", (prevedenyToken->polozkaTS.data), (prevedenyToken->polozkaTS.type));
 
         /** Uvolneni klicu */
         free(prevedenyToken->polozkaTS.key);
         tokenFree(&newVar);
-        return ID;
+        prevedenyToken->symbol = ID;
 	}
     else if (token.stav == s_desetinne_cislo) {
 	// **************************************************************************************
         tToken newVar;
         tokenInit(&newVar);
         generateVariable(&newVar);
-        //printf("data: %s\n", newVar.data);
+
+        prevedenyToken->polozkaTS.key = malloc(sizeof(char)*16);    /** Alokace pameti pro klic */
+        strcpy(prevedenyToken->polozkaTS.key, newVar.data);
+        prevedenyToken->symbol = ID;
+        prevedenyToken->polozkaTS.type = TYPEDOUBLE;
+        prevedenyToken->polozkaTS.druh = 0;
+        prevedenyToken->polozkaTS.data.floatNumber = atof(token.data);
+
+        htInsert(prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
+
+        free(prevedenyToken->polozkaTS.key);
         tokenFree(&newVar);
-        return ID;
+        prevedenyToken->symbol = ID;
 	}
     else if (token.stav == s_strednik)
-        return DOLAR;
+        prevedenyToken->symbol = DOLAR;
     else if (token.stav == s_klicove && (!strcmp(token.data, "then") || !strcmp(token.data, "do") || !strcmp(token.data, "end")))
-        return DOLAR;
+        prevedenyToken->symbol = DOLAR;
     //pridat jeste klicova slova, jako true a false apod.
-    else
-        return CHYBA;
+    else {
+        prevedenyToken->symbol = CHYBA;
+        return S_SYNTAKTICKA_CHYBA;
+    }
+
+    return S_BEZ_CHYB;
 }
 
 int redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
@@ -358,8 +374,7 @@ int precedencniSA() {
     tPrecTabulka akce;
     tData pomocna;
     tData terminal;
-    tData prevedenyToken2;
-    int prevedenyToken;
+    tData prevedenyToken;
     tData nejvrchTermSymbol;
     tData zarazka;
     zarazka.symbol = ZARAZKA;
@@ -374,11 +389,11 @@ int precedencniSA() {
     zasobnikPush(&zasobnik1, dolar);
 
     /** Dokud aktualni vstupni symbol a nejvrchnejsi terminalni symbol neni dolar, proved dalsi smycku */
-    while (!((prevedenyToken == DOLAR) && (nejvrchTermSymbol.symbol == DOLAR))) {
+    while (!((prevedenyToken.symbol == DOLAR) && (nejvrchTermSymbol.symbol == DOLAR))) {
 
         /** Prvni token dostaneme od SA rekurzivniho sestupu */
         if (precti == 1) {
-            prevedenyToken = prevedToken(token, &prevedenyToken2);
+            prevedToken(token, &prevedenyToken);
         }
 
         /** Je taky potreba najit nejvrchnejsi terminalni symbol na zasobniku: b */
@@ -387,18 +402,18 @@ int precedencniSA() {
         presypZasobnikZpet(&zasobnik2, &zasobnik1);
 
         /** Podle obsahu policka precedencni tabulky na souradnicich [b, a] se rozhodne */
-        akce = precedencniTabulka[nejvrchTermSymbol.symbol][prevedenyToken];
+        akce = precedencniTabulka[nejvrchTermSymbol.symbol][prevedenyToken.symbol];
 
         //printf("Akce: [%d][%d] %d\n", nejvrchTermSymbol.symbol, prevedenyToken,akce);
 
         /** Po dokonceni syntakticke analyzy vstupniho retezce opoustime cyklus */
-        if ((prevedenyToken == DOLAR) && (nejvrchTermSymbol.symbol == DOLAR))
+        if ((prevedenyToken.symbol == DOLAR) && (nejvrchTermSymbol.symbol == DOLAR))
             break;
 
         switch (akce) {
 
         case R:
-            pomocna.symbol = prevedenyToken;
+            pomocna.symbol = prevedenyToken.symbol;
             zasobnikPush(&zasobnik1, pomocna);
             precti = 1;
             break;
@@ -407,7 +422,7 @@ int precedencniSA() {
             presypZasobnikyPoTerminal(&zasobnik1, &zasobnik2);
             zasobnikPush(&zasobnik1, zarazka);              /** Vlozime < na zasobnik */
             presypZasobnikZpet(&zasobnik2, &zasobnik1);
-            terminal.symbol = prevedenyToken;               /** Precteme token ze vstupu a dame na vrchol zasobniku */
+            terminal.symbol = prevedenyToken.symbol;        /** Precteme token ze vstupu a dame na vrchol zasobniku */
             zasobnikPush(&zasobnik1, terminal);
             precti = 1;
             break;

@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include "scanner.h"
 #include "ial.h"
+#include "navratova_hodnota.h"
 
 /** Enumy pro vyplneni precedencni tabulky */
 typedef enum {
@@ -83,7 +84,7 @@ void presypZasobnikyPoTerminal(tZasobnik *zasobnik1, tZasobnik *zasobnik2);
 void presypZasobnikZpet(tZasobnik *zasobnik2, tZasobnik *zasobnik1);
 
 /** Funkce prevede token na terminal */
-int prevedToken(tToken token, tData *prevedenyToken);
+tChyba prevedToken(tToken token, tData *prevedenyToken);
 
 /** Funkce na overeni spravne funkcnosti zasobniku
     a precedencni tabulky */
