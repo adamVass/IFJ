@@ -120,10 +120,9 @@ void htInsert ( char *key, TData data, int type, int druh ) {
 	new->key = malloc(strlen(key)+1);
 	strcpy(new->key, key);
 	if( type == 0 ){
-		char *str = malloc( strlen(data.str)+1 );
-		if( !str ) return; // checky dodelat
-		strcpy( str, data.str );
-		new->data.str = str;
+		new->data.str = malloc( strlen(data.str)+1 );
+		if( !new->data.str ) return; // checky dodelat
+		strcpy( new->data.str, data.str );
 	}
 	else new->data = data;
 	new->type = type;
