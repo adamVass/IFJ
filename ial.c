@@ -115,25 +115,21 @@ void htInsert ( char *key, TData data, int type, int druh ) {
 	if( !ptrht || !key ){
 		return;
 	}
-	//hledani podle klice
-	TItem *tmp = htSearch( key );
-	//prvek nalezen, aktualizace datové části
-	if( tmp ){
-		tmp->data = data;
-		return;
+	
+	TItem *new = (TItem*)malloc(sizeof(struct TItem));
+	new->key = malloc(strlen(key)+1);
+	strcpy(new->key, key);
+	if( type == 0 ){
+		char *str = malloc( strlen(data.str)+1 );
+		if( !str ) return; // checky dodelat
+		strcpy( str, data.str );
+		new->data.str = str;
 	}
-	//prvek nebyl nalezen, musí být vytvořen
-	else{
-		TItem *new = (TItem*)malloc(sizeof(struct TItem));
-		new->key = malloc(strlen(key)+1);
-		strcpy(new->key, key);
-		new->data = data;
-		new->type = type;
-		new->druh = druh;
-		int hashKey = hashCode(key);
-		new->ptrnext = (*ptrht)[hashKey];
-		(*ptrht)[hashKey] = new;
-	}
+	else new->data = data;
+	new->type = type;
+	int hashKey = hashCode(key);
+	new->ptrnext = (*ptrht)[hashKey];
+	(*ptrht)[hashKey] = new;
 }
 
 /*
