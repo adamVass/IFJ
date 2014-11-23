@@ -32,6 +32,7 @@ tZahlavi precedencniTabulka [VELIKOST_TABULKY][VELIKOST_TABULKY] = {
 
 /** Globalni promenne */
 int counterVar = 1;
+tToken newVar;
 
 /** Generuje jedinecne nazvy identifikatoru. Nazev se sklada ze znaku $, ktery nasleduje cislo.
     Postupne se tu generuji prirozena cisla a do nazvu promenne se ukladaji v reverzovanem poradi. */
@@ -142,8 +143,6 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
         prevedenyToken->symbol = NEROVNO;
     else if (token.stav == s_logicka_hodnota) {
     // **************************************************************************************
-        tToken newVar;
-        tokenInit(&newVar);
         generateVariable(&newVar);
 
         prevedenyToken->polozkaTS.key = malloc(sizeof(char)*16);    /** Alokace pameti pro klic */
@@ -156,25 +155,30 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
         else
             prevedenyToken->polozkaTS.data.boolValue = false;
 
+        /** Existenci v TS resit nemusime, protoze promenna ma unikatni nazev */
         htInsert(prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
 
         free(prevedenyToken->polozkaTS.key);
-        tokenFree(&newVar);
-        prevedenyToken->symbol = ID;
     }
     else if (token.stav == s_string) {
     // **************************************************************************************
-        tToken newVar;
-        tokenInit(&newVar);
         generateVariable(&newVar);
-        //printf("data: %s\n", newVar.data);
-        tokenFree(&newVar);
+
+        prevedenyToken->polozkaTS.key = malloc(sizeof(char)*16);
+        strcpy(prevedenyToken->polozkaTS.key, newVar.data);
         prevedenyToken->symbol = ID;
+        prevedenyToken->polozkaTS.type = TYPESTR;
+        prevedenyToken->polozkaTS.druh = 0;
+
+        prevedenyToken->polozkaTS.data.str = malloc(strlen(token.data)+1);
+        strcpy(prevedenyToken->polozkaTS.data.str, token.data);
+        htInsert(prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
+
+        free(prevedenyToken->polozkaTS.data.str);
+        free(prevedenyToken->polozkaTS.key);
     }
     else if (token.stav == s_cele_cislo) {
 	// **************************************************************************************
-        tToken newVar;
-        tokenInit(&newVar);
         generateVariable(&newVar);
 
         /** Naplneni struktury pro tabulku symbolu */
@@ -187,15 +191,11 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
 
         htInsert(prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
 
-        /** Uvolneni klicu */
+        /** Uvolneni klice */
         free(prevedenyToken->polozkaTS.key);
-        tokenFree(&newVar);
-        prevedenyToken->symbol = ID;
 	}
     else if (token.stav == s_desetinne_cislo) {
 	// **************************************************************************************
-        tToken newVar;
-        tokenInit(&newVar);
         generateVariable(&newVar);
 
         prevedenyToken->polozkaTS.key = malloc(sizeof(char)*16);    /** Alokace pameti pro klic */
@@ -208,8 +208,6 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
         htInsert(prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
 
         free(prevedenyToken->polozkaTS.key);
-        tokenFree(&newVar);
-        prevedenyToken->symbol = ID;
 	}
     else if (token.stav == s_strednik)
         prevedenyToken->symbol = DOLAR;
@@ -386,6 +384,9 @@ tChyba precedencniSA() {
     tData zarazka;
     zarazka.symbol = ZARAZKA;
 
+    /** Inicializace globalni promenne, do ktere se budou generovat unikatni nazvy promennych */
+    tokenInit(&newVar);
+
     /** Vytvoreni a inicializace hlavniho a pomocneho zasobniku */
     tZasobnik zasobnik1, zasobnik2;
     zasobnikInit(&zasobnik1);
@@ -461,6 +462,9 @@ tChyba precedencniSA() {
         zasobnikPop(&zasobnik1);
     while (!zasobnikEmpty(&zasobnik2))
         zasobnikPop(&zasobnik2);
+
+    /** Uvolneni nagenerovane promenne */
+    tokenFree(&newVar);
 
     return S_BEZ_CHYB;
 }
