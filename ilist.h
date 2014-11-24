@@ -37,6 +37,16 @@ typedef struct
   tItemPtr Active;
 } tList;
 
+/** Vycet instrukci */
+typedef enum {
+    OC_ADD,
+    OC_SUB,
+    OC_MUL,
+    OC_DIV
+} TOpCode;
+
+tList listIntrukci;
+
 void ErrReport();
 void InitList (tList *L);
 void DisposeList (tList *L);
