@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "precedencni_analyza.h"
-#include "ilist.h"
 //#include "syntakticka_analyza.h"
 
 TItem* UNDEFPTR;
@@ -49,14 +48,6 @@ printf ("Items count %i The longest list %i\n",sumcnt,maxlen);
 printf ("------------------------------------\n");
 }
 
-void printList () {
-    while (listIntrukci.First != NULL) {
-
-        printf("V listu je := %d\n", listIntrukci.First->instruction.instructionType);
-        listIntrukci.First = listIntrukci.First->nextItem;
-    }
-}
-
 
 int main (int argc, char *argv[]) {
 
@@ -85,9 +76,6 @@ int main (int argc, char *argv[]) {
     /** Tabulka symbolu */
     htInit();
 
-    /** Seznam instrukci */
-    InitList (&listIntrukci);
-
     int navrat;
     tokenInit(&token);
     token = getNextToken();
@@ -107,9 +95,7 @@ int main (int argc, char *argv[]) {
 		printf("neni v tabulce\n");
 	}
 
-	printList();
-
-    //htPrintTable();
+    htPrintTable();
 
     /*int navrat;
     navrat = syntakticka_anal();

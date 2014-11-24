@@ -9,8 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "precedencni_analyza.h"
-#include "ilist.h"
-#include "mystring.h"
 
 #define VELIKOST_TABULKY 14
 
@@ -48,16 +46,6 @@ void generateVariable(tToken *var) {
         i = i / 10;
     }
     counterVar ++;
-}
-
-/** Funkce vlozi instrukci do seznamu instrukci */
-void generateInstruction(int typInstrukce, void *addr1, void *addr2, void *addr3) {
-   tInst I;
-   I.instructionType = typInstrukce;
-   I.address1 = addr1;
-   I.address2 = addr2;
-   I.address3 = addr3;
-   InsertLast(&listIntrukci, I);
 }
 
 void zasobnikInit(tZasobnik *zasobnik) {
@@ -235,7 +223,7 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
 
 tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
     tData presyp;               /** Pomocna promenna na presunuti terminalu mezi zasobniky */
-    TOpCode operace;
+    //tData neterminal;           /** Napr. E, budeme na nej redukovat */
     tData hledameZarazku;       /** Potrebujeme najit na zasobniku < */
     zasobnikPrectiVrchol(zasobnik1, &hledameZarazku);
 
@@ -269,28 +257,9 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
                 zasobnikPrectiVrchol(zasobnik2, &prectiTerminal2);
                 zasobnikPop(zasobnik2);
 
-                    /** Za neterminalem E je operator */
                 if ((prectiTerminal2.symbol == PLUS) || (prectiTerminal2.symbol== MINUS) || (prectiTerminal2.symbol == KRAT) || (prectiTerminal2.symbol == DELENO) ||
                         (prectiTerminal2.symbol == MENSI) || (prectiTerminal2.symbol == VETSI) || (prectiTerminal2.symbol == MENSIROVNO) ||
                         (prectiTerminal2.symbol == VETSIROVNO) || (prectiTerminal2.symbol == ROVNO) || (prectiTerminal2.symbol == NEROVNO)) {
-
-
-                            /** Zjisteni operatoru */
-                        if (prectiTerminal2.symbol == PLUS) {
-                            operace = OC_ADD;
-                        }
-                        else if (prectiTerminal2.symbol == MINUS) {
-                            operace = OC_SUB;
-                        }
-
-                        else if (prectiTerminal2.symbol == KRAT) {
-                            operace = OC_MUL;
-                        }
-                        else if (prectiTerminal2.symbol == DELENO) {
-                            operace = OC_DIV;
-                        }
-
-
                     if (!zasobnikEmpty(zasobnik2)) {
                         zasobnikPrectiVrchol(zasobnik2, &prectiTerminal3);
                         zasobnikPop(zasobnik2);
@@ -299,25 +268,14 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
                         fprintf(stderr, "Chybi E\n");
                         return S_SYNTAKTICKA_CHYBA;
                     }
-                        /** Aritmeticke operatory */
+                        //rozdelit na operatory aritmeticke, porovnavaci, konkatenace -> jine semanticke akce
                     if ((prectiTerminal2.symbol == PLUS) || (prectiTerminal2.symbol == MINUS) || (prectiTerminal2.symbol == KRAT) || (prectiTerminal2.symbol == DELENO)) {
                         if (prectiTerminal3.symbol == NETERMINAL) {
                             if (zasobnikEmpty(zasobnik2)) {
                                 zasobnikPop(zasobnik1);     // odstraneni < zarazky
-
                                 neterminal = prectiTerminal3;
-                                generateVariable(&newVar);
-                                neterminal.polozkaTS.key = allocString(newVar.data);
                                 neterminal.symbol = NETERMINAL;
-
                                 zasobnikPush(zasobnik1, neterminal);
-
-                                /** Vlozeni do TS */
-                                htInsert(neterminal.polozkaTS.key, neterminal.polozkaTS.data, neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
-                                free(neterminal.polozkaTS.key);
-
-                                /** Vlozeni instrukce do seznamu */
-                                generateInstruction(operace, htSearch(prectiTerminal.polozkaTS.key), htSearch(prectiTerminal3.polozkaTS.key), htSearch(neterminal.polozkaTS.key));
                                 return S_BEZ_CHYB;
                             }
                             else {
@@ -327,27 +285,14 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
                         }
                         // neni neterminal -> osetrit
                     }
-                        /** Relacni operatory */
                     else if ((prectiTerminal2.symbol == MENSI) || (prectiTerminal2.symbol == VETSI) || (prectiTerminal2.symbol == MENSIROVNO) ||
                             (prectiTerminal2.symbol == VETSIROVNO) || (prectiTerminal2.symbol == ROVNO) || (prectiTerminal2.symbol == NEROVNO)) {
                         if (prectiTerminal3.symbol == NETERMINAL) {
                             if (zasobnikEmpty(zasobnik2)) {
                                 zasobnikPop(zasobnik1);             /** Odstraneni < zarazky */
-
                                 neterminal = prectiTerminal3;
-                                generateVariable(&newVar);
-                                neterminal.polozkaTS.key = allocString(newVar.data);
                                 neterminal.symbol = NETERMINAL;
-
                                 zasobnikPush(zasobnik1, neterminal);
-
-                                /** Vlozeni do TS */
-                                htInsert(neterminal.polozkaTS.key, neterminal.polozkaTS.data, neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
-                                free(neterminal.polozkaTS.key);
-
-                                /** Vlozeni instrukce do seznamu */
-                                generateInstruction(operace, htSearch(prectiTerminal.polozkaTS.key), htSearch(prectiTerminal3.polozkaTS.key), htSearch(neterminal.polozkaTS.key));
-
                                 return S_BEZ_CHYB;
                             }
                             else {
