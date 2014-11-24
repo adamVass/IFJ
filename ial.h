@@ -25,14 +25,26 @@
 
 // typ dat
 
+
+
 #define TYPESTR      0
 #define TYPEBOOL     1
 #define TYPEINT      2
 #define TYPEDOUBLE   3
+#define TYPEFUNC     4
 
+#define ID_FUNCTION  5
+#define ID_LOCAL     6
+#define ID_GLOBAL    7
+#define ID_PARAM     8
 
 #define TYPEUNDEF    10
 
+typedef struct TParam{
+   int numParam;     //pocet parametru - vynulovat pri vkladani funkce
+   char **param;     //parametry
+   int *typeParam;   //typy parametru
+}TParam;
 
 /* typ obsahu (například cena zboží) */
 typedef union TData{
@@ -40,6 +52,7 @@ typedef union TData{
    bool boolValue;
    int intNumber;
    double floatNumber;
+   TParam param;
 }TData;
 
 /*Datová položka TRP s explicitně řetězenými synonymy*/
@@ -68,6 +81,12 @@ tHTable* ptrht;
 extern int HTSIZE;
 
 /* Hlavičky řešených procedur a funkcí. */
+
+
+int htCompleteInsert( char *key, int druh, int type );
+
+
+int htParamInsert( char *key, char *param, int type );
 
 int hashCode ( char *key );
 

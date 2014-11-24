@@ -39,8 +39,57 @@
 */
 
 #include "ial.h"
+#include <stdio.h>
 
 int HTSIZE = MAX_HTSIZE;
+
+int htCompleteInsert( char *key, int druh, int type )
+{
+	TItem *tmp = (*ptrht)[hashCode(key)];
+	if( !tmp ){
+		return -1;
+	}
+	tmp->druh = druh;
+	tmp->type = type;
+	return 0; 
+}
+
+int htParamInsert( char *key, char *param, int type )
+{
+	if( !ptrht || !param ){
+		return -1;
+	}
+	//najdeme funcki
+	TItem *tmp = (*ptrht)[hashCode(key)];
+	if( !tmp ){
+		return -1;
+	}
+	//+1 parametr
+	tmp->data.param.numParam++;
+	//alokuju vetsi potrebne pole parametru a typu
+	char **tmpParam = (char**)malloc( sizeof(char*)*tmp->data.param.numParam );
+	int *tmpTypeParam = (int*)malloc( sizeof(int)*tmp->data.param.numParam );
+	//prekopiruju
+	for (int i = 0; i < tmp->data.param.numParam - 1 ; ++i){
+		tmpParam[i] = tmp->data.param.param[i];
+		tmpTypeParam[i] = tmp->data.param.typeParam[i];
+	}
+	// kopie parametru - char *param 
+	char *tmpChar = (char*)malloc( strlen(param)+1 );
+	strcpy( tmpChar, param );
+	//pridani noveho parametru a jeho typu 
+	tmpParam[tmp->data.param.numParam] = tmpChar;
+	tmpTypeParam[tmp->data.param.numParam] = type;
+	//uvolneni starych poli
+	if( tmp->data.param.numParam != 1 ){
+		free(tmp->data.param.param);
+		free(tmp->data.param.typeParam);
+	}
+	//predani pointru
+	tmp->data.param.param = tmpParam;
+	tmp->data.param.typeParam = tmpTypeParam;
+	return 0;
+}
 
 /*          -------
 ** Rozptylovací funkce - jejím úkolem je zpracovat zadaný klíč a přidělit
@@ -118,14 +167,19 @@ void htInsert ( char *key, TData data, int type, int druh ) {
 	
 	TItem *new = (TItem*)malloc(sizeof(struct TItem));
 	new->key = malloc(strlen(key)+1);
+
 	strcpy(new->key, key);
+	
 	if( type == 0 ){
+		
 		new->data.str = malloc( strlen(data.str)+1 );
+		
 		if( !new->data.str ) return; // checky dodelat
 		strcpy( new->data.str, data.str );
 	}
 	else new->data = data;
 	new->type = type;
+	new->druh = druh;
 	int hashKey = hashCode(key);
 	new->ptrnext = (*ptrht)[hashKey];
 	(*ptrht)[hashKey] = new;

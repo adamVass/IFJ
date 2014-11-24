@@ -4,6 +4,8 @@
 /**  Autor: Karel Fajkus                */
 /**  email: xfajku05@stud.fit.vutbr.cz  */
 /****************************************/
+#include "precedencni_analyza.h"
+
 
 int syntakticka_anal();
 tChyba FUNKCE();
