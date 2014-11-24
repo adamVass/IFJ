@@ -314,10 +314,13 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
 
                                 /** Vlozeni do TS */
                                 htInsert(neterminal.polozkaTS.key, neterminal.polozkaTS.data, neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
-                                free(neterminal.polozkaTS.key);
+
 
                                 /** Vlozeni instrukce do seznamu */
                                 generateInstruction(operace, htSearch(prectiTerminal.polozkaTS.key), htSearch(prectiTerminal3.polozkaTS.key), htSearch(neterminal.polozkaTS.key));
+
+                                free(neterminal.polozkaTS.key);
+
                                 return S_BEZ_CHYB;
                             }
                             else {
@@ -343,11 +346,11 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
 
                                 /** Vlozeni do TS */
                                 htInsert(neterminal.polozkaTS.key, neterminal.polozkaTS.data, neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
-                                free(neterminal.polozkaTS.key);
 
                                 /** Vlozeni instrukce do seznamu */
                                 generateInstruction(operace, htSearch(prectiTerminal.polozkaTS.key), htSearch(prectiTerminal3.polozkaTS.key), htSearch(neterminal.polozkaTS.key));
 
+                                free(neterminal.polozkaTS.key);
                                 return S_BEZ_CHYB;
                             }
                             else {
@@ -433,7 +436,7 @@ tChyba precedencniSA() {
     tChyba navrat;
     tData dolar;
     tPrecTabulka akce;
-    tData prevedenyToken;
+    tData prevedenyToken = { .symbol = 0 };
     tData nejvrchTermSymbol;
     tData zarazka;
     zarazka.symbol = ZARAZKA;
