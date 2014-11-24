@@ -57,6 +57,9 @@ typedef struct {
     tPolozka *vrchol;
 } tZasobnik;
 
+/** Globalni promenna - mezivysledek vyrazu */
+tData neterminal;
+
 /**
  *  Hlavicky funkci
  */

@@ -223,7 +223,7 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
 
 tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
     tData presyp;               /** Pomocna promenna na presunuti terminalu mezi zasobniky */
-    tData neterminal;           /** Napr. E, budeme na nej redukovat */
+    //tData neterminal;           /** Napr. E, budeme na nej redukovat */
     tData hledameZarazku;       /** Potrebujeme najit na zasobniku < */
     zasobnikPrectiVrchol(zasobnik1, &hledameZarazku);
 
@@ -244,7 +244,8 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
         /** pokud je terminal ID, tak redukujeme podle pravidla E -> i */
         if (prectiTerminal.symbol == ID) {
             zasobnikPop(zasobnik1);                                 /** Musime odstranit zarazku z prvniho zasobniku */
-            neterminal = prectiTerminal;                            // bude obsahovat informace o (zatim tokenu) pozdeji hodnotach apod
+
+            neterminal = prectiTerminal;
             neterminal.symbol = NETERMINAL;                         /** Prepiseme na neterminal */
             zasobnikPush(zasobnik1, neterminal);                    /** Po redukci vlozime neterminal E na prvni zasobnik */
             return S_BEZ_CHYB;
@@ -377,8 +378,6 @@ tChyba precedencniSA() {
     tChyba navrat;
     tData dolar;
     tPrecTabulka akce;
-    tData pomocna;
-    tData terminal;
     tData prevedenyToken;
     tData nejvrchTermSymbol;
     tData zarazka;
@@ -412,8 +411,6 @@ tChyba precedencniSA() {
         /** Podle obsahu policka precedencni tabulky na souradnicich [b, a] se rozhodne */
         akce = precedencniTabulka[nejvrchTermSymbol.symbol][prevedenyToken.symbol];
 
-        //printf("Akce: [%d][%d] %d\n", nejvrchTermSymbol.symbol, prevedenyToken,akce);
-
         /** Po dokonceni syntakticke analyzy vstupniho retezce opoustime cyklus */
         if ((prevedenyToken.symbol == DOLAR) && (nejvrchTermSymbol.symbol == DOLAR))
             break;
@@ -421,8 +418,8 @@ tChyba precedencniSA() {
         switch (akce) {
 
         case R:
-            pomocna.symbol = prevedenyToken.symbol;
-            zasobnikPush(&zasobnik1, pomocna);
+            //pomocna.symbol = prevedenyToken.symbol;
+            zasobnikPush(&zasobnik1, prevedenyToken);
             precti = 1;
             break;
 
@@ -430,8 +427,8 @@ tChyba precedencniSA() {
             presypZasobnikyPoTerminal(&zasobnik1, &zasobnik2);
             zasobnikPush(&zasobnik1, zarazka);              /** Vlozime < na zasobnik */
             presypZasobnikZpet(&zasobnik2, &zasobnik1);
-            terminal.symbol = prevedenyToken.symbol;        /** Precteme token ze vstupu a dame na vrchol zasobniku */
-            zasobnikPush(&zasobnik1, terminal);
+            /** Precteme token ze vstupu a dame na vrchol zasobniku */
+            zasobnikPush(&zasobnik1, prevedenyToken);
             precti = 1;
             break;
 
