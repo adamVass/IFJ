@@ -170,7 +170,6 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
         /** Existenci v TS resit nemusime, protoze promenna ma unikatni nazev */
         htInsert(prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
 
-        free(prevedenyToken->polozkaTS.key);
     }
     else if (token.stav == s_string) {
     // **************************************************************************************
@@ -186,8 +185,6 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
         strcpy(prevedenyToken->polozkaTS.data.str, token.data);
         htInsert(prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
 
-        free(prevedenyToken->polozkaTS.data.str);
-        free(prevedenyToken->polozkaTS.key);
     }
     else if (token.stav == s_cele_cislo) {
 	// **************************************************************************************
@@ -203,8 +200,6 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
 
         htInsert(prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
 
-        /** Uvolneni klice */
-        free(prevedenyToken->polozkaTS.key);
 	}
     else if (token.stav == s_desetinne_cislo) {
 	// **************************************************************************************
@@ -219,7 +214,6 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
 
         htInsert(prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
 
-        free(prevedenyToken->polozkaTS.key);
 	}
     else if (token.stav == s_strednik)
         prevedenyToken->symbol = DOLAR;
@@ -317,9 +311,9 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
 
 
                                 /** Vlozeni instrukce do seznamu */
+printf("OP1 %s\n", prectiTerminal.polozkaTS.key);
+printf("OP2 %s\n", prectiTerminal3.polozkaTS.key);
                                 generateInstruction(operace, htSearch(prectiTerminal.polozkaTS.key), htSearch(prectiTerminal3.polozkaTS.key), htSearch(neterminal.polozkaTS.key));
-
-                                free(neterminal.polozkaTS.key);
 
                                 return S_BEZ_CHYB;
                             }
@@ -350,7 +344,6 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
                                 /** Vlozeni instrukce do seznamu */
                                 generateInstruction(operace, htSearch(prectiTerminal.polozkaTS.key), htSearch(prectiTerminal3.polozkaTS.key), htSearch(neterminal.polozkaTS.key));
 
-                                free(neterminal.polozkaTS.key);
                                 return S_BEZ_CHYB;
                             }
                             else {
