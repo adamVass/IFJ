@@ -1,68 +1,27 @@
-
-/* c016.c: **********************************************************}
-{* Téma:  Tabulka s Rozptýlenými Položkami
-**                      První implementace: Petr Přikryl, prosinec 1994
-**                      Do jazyka C prepsal a upravil: Vaclav Topinka, 2005
-**                      Úpravy: Karel Masařík, říjen 2013
-**
-** Vytvořete abstraktní datový typ
-** TRP (Tabulka s Rozptýlenými Položkami = Hash table)
-** s explicitně řetězenými synonymy. Tabulka je implementována polem
-** lineárních seznamů synonym.
-**
-** Implementujte následující procedury a funkce.
-**
-**  HTInit ....... inicializuje tabulku před prvním použitím
-**  HTInsert ..... vložení prvku
-**  HTSearch ..... zjištění přítomnosti prvku v tabulce
-**  HTDelete ..... zrušení prvku
-**  HTRead ....... přečtení hodnoty prvku
-**  HTClearAll ... zrušení obsahu celé tabulky (inicializace tabulky
-**                 poté, co již byla použita)
-**
-** Definici typů naleznete v souboru c016.h.
-**
-** Tabulka je reprezentována datovou strukturou typu tHTable,
-** která se skládá z ukazatelů na položky, jež obsahují složky
-** klíče 'key', obsahu 'data' (pro jednoduchost typu float), a
-** ukazatele na další synonymum 'ptrnext'. Při implementaci funkcí
-** uvažujte maximální rozměr pole HTSIZE.
-**
-** U všech procedur využívejte rozptylovou funkci hashCode.  Povšimněte si
-** způsobu předávání parametrů a zamyslete se nad tím, zda je možné parametry
-** předávat jiným způsobem (hodnotou/odkazem) a v případě, že jsou obě
-** možnosti funkčně přípustné, jaké jsou výhody či nevýhody toho či onoho
-** způsobu.
-**
-** V příkladech jsou použity položky, kde klíčem je řetězec, ke kterému
-** je přidán obsah - reálné číslo.
-*/
-
 #include "ial.h"
-#include <stdio.h>
 
 int HTSIZE = MAX_HTSIZE;
 
-int htCompleteInsert( char *key, int druh, int type )
+tChyba htCompleteInsert( tHTable *ptrht, char *key, int druh, int type )
 {
 	TItem *tmp = (*ptrht)[hashCode(key)];
 	if( !tmp ){
-		return -1;
+		return S_INTERNI_CHYBA;
 	}
 	tmp->druh = druh;
 	tmp->type = type;
-	return 0; 
+	return S_BEZ_CHYB; 
 }
 
-int htParamInsert( char *key, char *param, int type )
+tChyba htParamInsert( tHTable *ptrht, char *key, char *param, int type )
 {
-	if( !ptrht || !param ){
-		return -1;
+	if( !ptrht || !param || !key ){
+		return S_INTERNI_CHYBA;
 	}
-	//najdeme funcki
+	//najdeme funkci
 	TItem *tmp = (*ptrht)[hashCode(key)];
 	if( !tmp ){
-		return -1;
+		return S_INTERNI_CHYBA;
 	}
 	//+1 parametr
 	tmp->data.param.numParam++;
@@ -88,7 +47,7 @@ int htParamInsert( char *key, char *param, int type )
 	//predani pointru
 	tmp->data.param.param = tmpParam;
 	tmp->data.param.typeParam = tmpTypeParam;
-	return 0;
+	return S_BEZ_CHYB;
 }
 
 /*          -------
@@ -112,15 +71,16 @@ int hashCode ( char *key ) {
 ** se volá pouze před prvním použitím tabulky.
 */
 
-void htInit () {
-	ptrht = (tHTable*) malloc ( sizeof(tHTable) );
+tChyba htInit( tHTable **ptrht ){
+	*ptrht = (tHTable*) malloc ( sizeof(tHTable) );
 	if( !ptrht ){
-		return;
+		return S_INTERNI_CHYBA;
 	}
 	//inicializace celé tabulky
 	for (int i = 0; i < HTSIZE; ++i){
-		(*ptrht)[i] = NULL;
+		(*(*ptrht))[i] = NULL;
 	}
+	return S_BEZ_CHYB;
 }
 
 /* TRP s explicitně zřetězenými synonymy.
@@ -130,7 +90,7 @@ void htInit () {
 **
 */
 
-TItem* htSearch ( char *key ) {
+TItem* htSearch( tHTable *ptrht, char *key ) {
 
 	if( !ptrht || !key ){
 		return NULL;
@@ -149,13 +109,16 @@ TItem* htSearch ( char *key ) {
 
 //novej htInsert
 
-void htDeclInsert ( char *key, int type, int druh ) {
+tChyba htDeclInsert( tHTable *ptrht, char *key, int type, int druh ) {
 
 	if( !ptrht || !key ){
-		return;
+		return S_INTERNI_CHYBA;
 	}
 	
 	TItem *new = (TItem*)malloc(sizeof(struct TItem));
+	if( !new ){
+		return S_INTERNI_CHYBA;
+	}
 	new->key = malloc(strlen(key)+1);
 
 	strcpy(new->key, key);
@@ -164,6 +127,7 @@ void htDeclInsert ( char *key, int type, int druh ) {
 	int hashKey = hashCode(key);
 	new->ptrnext = (*ptrht)[hashKey];
 	(*ptrht)[hashKey] = new;
+	return S_BEZ_CHYB;
 }
 
 
@@ -179,22 +143,25 @@ void htDeclInsert ( char *key, int type, int druh ) {
 ** tedy proveďte.vložení prvku na začátek seznamu.
 **/
 
-void htInsert ( char *key, TData data, int type, int druh ) {
+tChyba htInsert ( tHTable *ptrht, char *key, TData data, int type, int druh ) {
 
 	if( !ptrht || !key ){
-		return;
+		return S_INTERNI_CHYBA;
 	}
 	
 	TItem *new = (TItem*)malloc(sizeof(struct TItem));
+	if( !new ){
+		return S_INTERNI_CHYBA;
+	}
 	new->key = malloc(strlen(key)+1);
-
 	strcpy(new->key, key);
 	
 	if( type == 0 ){
 		
 		new->data.str = malloc( strlen(data.str)+1 );
-		
-		if( !new->data.str ) return; // checky dodelat
+		if( !new->data.str ){
+			return S_INTERNI_CHYBA;
+		}
 		strcpy( new->data.str, data.str );
 	}
 	else new->data = data;
@@ -203,6 +170,7 @@ void htInsert ( char *key, TData data, int type, int druh ) {
 	int hashKey = hashCode(key);
 	new->ptrnext = (*ptrht)[hashKey];
 	(*ptrht)[hashKey] = new;
+	return S_BEZ_CHYB;
 }
 
 /*
@@ -214,13 +182,13 @@ void htInsert ( char *key, TData data, int type, int druh ) {
 ** Využijte dříve vytvořenou funkci HTSearch.
 */
 
-TData* htRead ( char *key ) {
+TData* htRead( tHTable *ptrht, char *key ) {
 
 	if( !ptrht || !key ){
 		return NULL;
 	}
 
-	TItem *tmp = htSearch( key );
+	TItem *tmp = htSearch( ptrht, key );
 	if( !tmp ){
 		return NULL;
 	}
@@ -237,10 +205,10 @@ TData* htRead ( char *key ) {
 ** V tomto případě NEVYUŽÍVEJTE dříve vytvořenou funkci HTSearch.
 */
 
-void htDelete ( char *key ) {
+tChyba htDelete( tHTable *ptrht, char *key ) {
 
 	if( !ptrht || !key ){
-		return;
+		return S_INTERNI_CHYBA;
 	}
 
 	int hashKey = hashCode(key);
@@ -259,11 +227,12 @@ void htDelete ( char *key ) {
 				tmp2->ptrnext = tmp2->ptrnext->ptrnext;
 			}
 			free( tmp );
-			return;
+			return S_BEZ_CHYB;
 		}
 		tmp2 = tmp;
 		tmp = tmp->ptrnext;
 	}
+	return S_BEZ_CHYB;
 }
 
 /* TRP s explicitně zřetězenými synonymy.
@@ -271,10 +240,10 @@ void htDelete ( char *key ) {
 ** který tyto položky zabíraly, a uvede tabulku do počátečního stavu.
 */
 
-void htClearAll () {
+tChyba htClearAll( tHTable *ptrht ) {
 
 	if( !ptrht ){
-		return;
+		return S_INTERNI_CHYBA;
 	}
 	//prochazí tabulku
  	for (int i = 0; i < HTSIZE; ++i){
@@ -283,7 +252,12 @@ void htClearAll () {
  		while( (*ptrht)[i] ){
  			tmp = (*ptrht)[i];
  			(*ptrht)[i] = (*ptrht)[i]->ptrnext;
+ 			if( tmp->type == 0 ){
+ 				free( tmp->data.str );
+ 			}
+ 			free( tmp->key );
  			free( tmp );
  		}
  	}
+ 	return S_BEZ_CHYB;
 }
