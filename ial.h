@@ -1,31 +1,12 @@
-
-/* Hlavičkový soubor pro c016.h - Tabulka s Rozptýlenými Položkami,
-**  obsahuje jednak nutné includes a externované proměnné,
-**  ale rovnež definici datových typů. Tento soubor neupravujte!
-**  Téma:  Tabulka s explicitně zřetězenými synonymy
-**                      První implementace: Petr Přikryl, prosinec 1994
-**                      Do jazyka C prepsal a upravil: Vaclav Topinka, 2005
-**                      Úpravy: Karel Masařík, říjen 2013
-**
-***/
-
-
 #ifndef _HASHTABLE_H_
 #define _HASHTABLE_H_
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
 
-/* Maximální velikost pole pro implementaci
-   vyhledávací tabulky. Řešené procedury však
-   využívají pouze HTSIZE prvků pole (viz deklarace této proměnné).
-*/
-#define MAX_HTSIZE 131
-
-// typ dat
-
-
+#define MAX_HTSIZE 61
 
 #define TYPESTR      0
 #define TYPEBOOL     1
@@ -68,7 +49,8 @@ typedef union TData{
 typedef TItem* tHTable[MAX_HTSIZE];
 
 /* Globalni promenna hash table */
-tHTable* ptrht;
+tHTable *ptrhtGlobal;
+tHTable *ptrhtLocal;
 
 /* Pro účely testování je vhodné mít možnost volby velikosti pole,
    kterým je vyhledávací tabulka implementována. Fyzicky je deklarováno
@@ -83,25 +65,24 @@ extern int HTSIZE;
 /* Hlavičky řešených procedur a funkcí. */
 
 
-int htCompleteInsert( char *key, int druh, int type );
+tChyba htCompleteInsert( tHTable *ptrht, char *key, int druh, int type );
 
+tChyba htParamInsert( tHTable *ptrht, char *key, char *param, int type );
 
-int htParamInsert( char *key, char *param, int type );
+int hashCode( char *key );
 
-int hashCode ( char *key );
+tChyba htInit( tHTable **ptrht );
 
-void htInit ();
+TItem* htSearch( tHTable *ptrht, char *key );
 
-TItem* htSearch ( char *key );
+tChyba htInsert( tHTable *ptrht, char *key, TData data, int type, int druh );
 
-void htInsert ( char *key, TData data, int type, int druh );
+tChyba htDeclInsert( tHTable *ptrht, char *key, int type, int druh );
 
-void htDeclInsert ( char *key, int type, int druh );
+TData* htRead( tHTable *ptrht, char *key );
 
-TData* htRead ( char *key );
+tChyba htDelete( tHTable *ptrht, char *key );
 
-void htDelete ( char *key );
-
-void htClearAll ();
+tChyba htClearAll( tHTable *ptrht );
 
 #endif
