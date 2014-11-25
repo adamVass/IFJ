@@ -13,6 +13,7 @@
 
 TItem* UNDEFPTR;
 
+
 void htPrintTable() {
 int maxlen = 0;
 int sumcnt = 0;
@@ -49,10 +50,29 @@ printf ("Items count %i The longest list %i\n",sumcnt,maxlen);
 printf ("------------------------------------\n");
 }
 
+void printdata( TItem *tmp ){
+    if( tmp->type == 0 ){
+        printf("retezec: %s\n", tmp->data.str );
+    }
+	else if( tmp->type == 1 ){
+        printf("Bool hodnota: %s\n", tmp->data.boolValue ? "true" : "false");
+    }
+    else if( tmp->type == 2 ){
+        printf("Intcislo: %d\n", tmp->data.intNumber );
+    }
+    else if( tmp->type == 3 ){
+        printf("Intcislo: %lf\n", tmp->data.floatNumber );
+    }
+}
+
 void printList () {
     while (listIntrukci.First != NULL) {
 
         printf("V listu je := %d\n", listIntrukci.First->instruction.instructionType);
+        TItem *tmp = (TItem*)listIntrukci.First->instruction.address1;
+        printdata(tmp);
+        tmp = (TItem*)listIntrukci.First->instruction.address2;
+        printdata(tmp);
         listIntrukci.First = listIntrukci.First->nextItem;
     }
 }
@@ -71,7 +91,7 @@ int main (int argc, char *argv[]) {
         fprintf(stderr, "Soubor nejde otevrit\n");
         return S_INTERNI_CHYBA;
     }
-	setSourceFile(f);
+    setSourceFile(f);
 
     /** Test lexikalniho analyzatoru */
     /*tToken navrat;
@@ -97,17 +117,8 @@ int main (int argc, char *argv[]) {
     else
         printf("Syntakticka analyza NO\n");
 
-    TItem* tmp = htSearch("$3");
-	if (tmp != NULL) {
-		printf("TS KEY: %s\n", tmp->key);
-        	printf("TS DATA.intNumber: %d\n", tmp->data.intNumber);
-        	printf("TS TYPE: %d\n", tmp->type);
-	}
-	else {
-		printf("neni v tabulce\n");
-	}
+    printList();
 
-	printList();
 
     //htPrintTable();
 
