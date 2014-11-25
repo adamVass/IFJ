@@ -261,3 +261,32 @@ tChyba htClearAll( tHTable *ptrht ) {
  	}
  	return S_BEZ_CHYB;
 }
+
+/** BUILTIN FUNCTIONS */
+
+char *strCopy(char *str, unsigned int s, unsigned int n)
+{
+/** Returns a string which is a copy of str, starting at index s - 1, n characters long.
+* @param *str Source string
+* @param s Start index
+* @param n Number of characters to be copied
+* @return Pointer to the created substring
+*/
+	char *result;
+	unsigned int len = strlen(str);
+	if (s > len)
+	{
+		return EMPTY_STRING;	/* Behavior mimicking Pascal's Copy function */
+	}
+
+	if (n > len) n = len - s + 1;	/* Size of resulting string can't be greater than length of original - starting index + 1 (indexing is from 1, not 0) */
+
+	if ((result = (char*)malloc(n * sizeof(char))) == NULL)
+	{
+		printf("strCopy memory allocation error\n");
+		return NULL;
+	}
+
+	strncpy(result, str + s - 1, n);	/* (str + s) - to begin from start index, -1 as indexing starts from 1 */
+	return result;
+}

@@ -21,6 +21,8 @@
 
 #define TYPEUNDEF    10
 
+#define EMPTY_STRING ""
+
 typedef struct TParam{
    int numParam;     //pocet parametru - vynulovat pri vkladani funkce
    char **param;     //parametry
@@ -84,5 +86,7 @@ TData* htRead( tHTable *ptrht, char *key );
 tChyba htDelete( tHTable *ptrht, char *key );
 
 tChyba htClearAll( tHTable *ptrht );
+
+char *strCopy(char *str, unsigned int s, unsigned int n);
 
 #endif
