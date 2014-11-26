@@ -1,0 +1,64 @@
+PROGRAM->FUNKCE . eof						OK
+
+FUNKCE->function id ( PARAMS : DTYPE ; DOPREDNE ; FUNKCE	OK
+FUNKCE->var DEKLARACE FUNKCE					OK	
+FUNKCE->begin ACT_LIST						OK
+
+PARAMS->id : DTYPE PARAMS					OK
+PARAMS->; id : DTYPE PARAMS					OK
+PARAMS->)							OK
+
+DOPREDNE->forward
+DOPREDNE->ACT_LIST
+
+PROM->id ( TERM							OK
+PROM->eps							OK
+
+DTYPE2->integer
+DTYPE2->real
+DTYPE2->string
+DTYPE2->boolean
+
+DTYPE->integer							OK
+DTYPE->real							OK
+DTYPE->string							OK
+DTYPE->boolean							OK
+
+ROZHODNI->PROM VESTAV EXPR					OK
+ROZHODNI->DTYPE							OK
+
+LEXEM->:=							OK
+LEXEM->:							OK
+
+UKONCOVACI->; ACT_LIST						OK
+UKONCOVACI->end							OK
+
+ACT_LIST->begin ACT_LIST 					OK
+ACT_LIST->id LEXEM ROZHODNI UKONCOVACI				OK
+ACT_LIST->var id : DTYPE ; ACT_LIST				OK
+ACT_LIST->if EXPR then CYKLUS else CYKLUS ACT_LIST		OK
+ACT_LIST->end							OK
+ACT_LIST->while EXPR do CYKLUS ACT_LIST 			OK
+ACT_LIST->readln ( id ) UKONCOVACI				OK
+ACT_LIST->write ( TERM UKONCOVACI				OK
+
+CYKLUS->begin ACT_LIST						OK
+
+VESTAV->length ( string )					OK
+VESTAV->copy (string ; string ; string)				OK
+VESTAV->find ( string; string ) 				OK
+VESTAV->sort ( string )						OK
+VESTAV->eps							OK
+
+EXPR->eps							OK
+EXPR->expression						OK
+
+DEKLARACE->id : DTYPE ; DEKLARACE				OK
+DEKLARACE->eps							OK
+
+DRUH->id
+DRUH->DTYPE2
+								OK
+TERM->, DRUH TERM
+TERM->DRUH TERM
+TERM->)								OK
