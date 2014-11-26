@@ -9,11 +9,10 @@
 *@brief Header file for ilist.c
 *@author Adam Vass (xvassa00)
  */
-
-#include "ial.h"
-
 #ifndef _ILIST_H_
 #define _ILIST_H_
+
+#include "ial.h"
 
 typedef struct
 {

@@ -5,6 +5,9 @@
 /**  email: xjosef00@stud.fit.vutbr.cz  */
 /****************************************/
 
+#ifndef _NAVR_H_
+#define _NAVR_H_
+
 /** Enum pro navratove kody interpretu */
 typedef enum {
     S_BEZ_CHYB,                 /** 00. */
@@ -23,3 +26,5 @@ typedef enum {
 
 /** Globalni promenna pro navratovy kod */
 extern tChyba navratovy_kod;
+
+#endif

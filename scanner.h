@@ -5,6 +5,9 @@
 /**  email: xjosef00@stud.fit.vutbr.cz  */
 /****************************************/
 
+#ifndef _SCANNER_H_
+#define _SCANNER_H_
+
 /**
  *  Stavy konecneho automatu
  */
@@ -85,3 +88,5 @@ int tokenChangeState(tToken *s, tStav stav);
 int checkKeyWords(char *s);
 
 void setSourceFile(FILE *source);
+
+#endif

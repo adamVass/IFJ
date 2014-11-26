@@ -5,6 +5,9 @@
 /**  email: xjosef00@stud.fit.vutbr.cz  */
 /****************************************/
 
+#ifndef _PREC_H_
+#define _PREC_H_
+
 #include <stdbool.h>
 #include "scanner.h"
 #include "ial.h"
@@ -99,3 +102,5 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2);
 
 /** Funkce provede analyzu vyrazu */
 tChyba precedencniSA();
+
+#endif

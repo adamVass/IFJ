@@ -399,9 +399,9 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
 
 
                         neterminal = prectiTerminal2;
-
-                        //neterminal = prectiTerminal3;
                         neterminal.symbol = NETERMINAL;
+
+                        printf("u zavorek: %d", prectiTerminal2.polozkaTS.data.intNumber);
 
                         /** Vlozeni do TS */
                         htInsert(neterminal.polozkaTS.key, neterminal.polozkaTS.data, neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
