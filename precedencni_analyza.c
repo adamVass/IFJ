@@ -12,6 +12,44 @@
 #include "ilist.h"
 #include "mystring.h"
 
+TItem* UNDEFPTR;
+
+void htPrintTable() {
+int maxlen = 0;
+int sumcnt = 0;
+printf ("------------HASH TABLE--------------\n");
+for ( int i=0; i<HTSIZE; i++ ) {
+printf ("%i:",i);
+int cnt = 0;
+TItem* ptr = (*ptrht)[i];
+while ( ptr != NULL ) {
+printf (" (%s)",ptr->key); // vytiskne klic
+if( ptr->type == 0 ){ // string
+printf(" %s", ptr->data.str);
+}
+else if( ptr->type == 1 ){ // bool
+printf(" %d", ptr->data.boolValue);
+}
+else if( ptr->type == 2 ){ // int
+printf(" %d", ptr->data.intNumber);
+}
+else if( ptr->type == 3 ){ // double
+printf(" %f", ptr->data.floatNumber);
+}
+if ( ptr != UNDEFPTR )
+cnt++;
+ptr = ptr->ptrnext;
+}
+printf ("\n");
+if (cnt > maxlen)
+maxlen = cnt;
+sumcnt+=cnt;
+}
+printf ("------------------------------------\n");
+printf ("Items count %i The longest list %i\n",sumcnt,maxlen);
+printf ("------------------------------------\n");
+}
+
 #define VELIKOST_TABULKY 14
 
 tZahlavi precedencniTabulka [VELIKOST_TABULKY][VELIKOST_TABULKY] = {
@@ -227,6 +265,40 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
     return S_BEZ_CHYB;
 }
 
+int zjistiOperator (int operace) {
+    if (operace == PLUS) {
+        return OC_ADD;
+    }
+    else if (operace == MINUS) {
+        return OC_SUB;
+    }
+    else if (operace == KRAT) {
+        return OC_MUL;
+    }
+    else if (operace == DELENO) {
+        return OC_DIV;
+    }
+    else if (operace == MENSI) {
+        return OC_MENSI;
+    }
+    else if (operace == VETSI) {
+        return OC_VETSI;
+    }
+    else if (operace == MENSIROVNO) {
+        return OC_MENSI_ROVNO;
+    }
+    else if (operace == VETSIROVNO) {
+        return OC_VETSI_ROVNO;
+    }
+    else if (operace == ROVNO) {
+        return OC_ROVNO;
+    }
+    else if (operace == NEROVNO) {
+        return OC_NEROVNO;
+    }
+    return S_SYNTAKTICKA_CHYBA;
+}
+
 tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
     tData presyp;               /** Pomocna promenna na presunuti terminalu mezi zasobniky */
     int operace;
@@ -255,122 +327,14 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
             neterminal.symbol = NETERMINAL;                         /** Prepiseme na neterminal */
 
             /** Vlozeni do TS */
-            htInsert(neterminal.polozkaTS.key, neterminal.polozkaTS.data, neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
+            //htInsert(neterminal.polozkaTS.key, neterminal.polozkaTS.data, neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
 
             /** Po redukci vlozime neterminal E na prvni zasobnik */
             zasobnikPush(zasobnik1, neterminal);
             return S_BEZ_CHYB;
         }
 
-        /** Pravidlo E -> E operator E */
-        else if (prectiTerminal.symbol == NETERMINAL) {
-            if(!zasobnikEmpty(zasobnik2)) {
-                zasobnikPrectiVrchol(zasobnik2, &prectiTerminal2);
-                zasobnikPop(zasobnik2);
-
-                    /** Za neterminalem E je operator */
-                if ((prectiTerminal2.symbol == PLUS) || (prectiTerminal2.symbol== MINUS) || (prectiTerminal2.symbol == KRAT) || (prectiTerminal2.symbol == DELENO) ||
-                        (prectiTerminal2.symbol == MENSI) || (prectiTerminal2.symbol == VETSI) || (prectiTerminal2.symbol == MENSIROVNO) ||
-                        (prectiTerminal2.symbol == VETSIROVNO) || (prectiTerminal2.symbol == ROVNO) || (prectiTerminal2.symbol == NEROVNO)) {
-
-
-                            /** Zjisteni operatoru */
-                        if (prectiTerminal2.symbol == PLUS) {
-                            operace = OC_ADD;
-                        }
-                        else if (prectiTerminal2.symbol == MINUS) {
-                            operace = OC_SUB;
-                        }
-                        else if (prectiTerminal2.symbol == KRAT) {
-                            operace = OC_MUL;
-                        }
-                        else if (prectiTerminal2.symbol == DELENO) {
-                            operace = OC_DIV;
-                        }
-
-
-                    if (!zasobnikEmpty(zasobnik2)) {
-                        zasobnikPrectiVrchol(zasobnik2, &prectiTerminal3);
-                        zasobnikPop(zasobnik2);
-                    }
-                    else {
-                        fprintf(stderr, "Chybi E\n");
-                        return S_SYNTAKTICKA_CHYBA;
-                    }
-                        /** Aritmeticke operatory */
-                    //if ((prectiTerminal2.symbol == PLUS) || (prectiTerminal2.symbol == MINUS) || (prectiTerminal2.symbol == KRAT) || (prectiTerminal2.symbol == DELENO)) {
-
-                    if ((operace == PLUS) || (operace == MINUS) || (operace == KRAT) || (operace == DELENO)) {
-                        if (prectiTerminal3.symbol == NETERMINAL) {
-                            if (zasobnikEmpty(zasobnik2)) {
-                                zasobnikPop(zasobnik1);     // odstraneni < zarazky
-
-                                //neterminal = prectiTerminal3;
-
-                                generateVariable(&newVar);
-                                neterminal.polozkaTS.key = allocString(newVar.data);
-                                neterminal.symbol = NETERMINAL;
-
-                                zasobnikPush(zasobnik1, neterminal);
-
-                                /** Vlozeni do TS */
-                                htInsert(neterminal.polozkaTS.key, neterminal.polozkaTS.data, neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
-
-                                /** Vlozeni instrukce do seznamu */
-                                generateInstruction(operace, htSearch(prectiTerminal.polozkaTS.key), htSearch(prectiTerminal3.polozkaTS.key), htSearch(neterminal.polozkaTS.key));
-
-                                return S_BEZ_CHYB;
-                            }
-                            else {
-                                fprintf(stderr, "Za E operator E jsou dalsi polozky\n");
-                                return S_SYNTAKTICKA_CHYBA;
-                            }
-                        }
-                        // neni neterminal -> osetrit
-                    }
-                        /** Relacni operatory */
-                    else if ((prectiTerminal2.symbol == MENSI) || (prectiTerminal2.symbol == VETSI) || (prectiTerminal2.symbol == MENSIROVNO) ||
-                            (prectiTerminal2.symbol == VETSIROVNO) || (prectiTerminal2.symbol == ROVNO) || (prectiTerminal2.symbol == NEROVNO)) {
-                        if (prectiTerminal3.symbol == NETERMINAL) {
-                            if (zasobnikEmpty(zasobnik2)) {
-                                zasobnikPop(zasobnik1);             /** Odstraneni < zarazky */
-
-                                //neterminal = prectiTerminal3;
-                                generateVariable(&newVar);
-                                neterminal.polozkaTS.key = allocString(newVar.data);
-                                neterminal.symbol = NETERMINAL;
-
-                                zasobnikPush(zasobnik1, neterminal);
-
-                                /** Vlozeni do TS */
-                                htInsert(neterminal.polozkaTS.key, neterminal.polozkaTS.data, neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
-
-                                /** Vlozeni instrukce do seznamu */
-                                generateInstruction(operace, htSearch(prectiTerminal.polozkaTS.key), htSearch(prectiTerminal3.polozkaTS.key), htSearch(neterminal.polozkaTS.key));
-
-                                return S_BEZ_CHYB;
-                            }
-                            else {
-                                fprintf(stderr, "Za E operator E jsou dalsi polozky\n");
-                                return S_SYNTAKTICKA_CHYBA;
-                            }
-                        }
-                        // neni neterminal -> osetrit
-                    }
-                    // spatny operator? -> osetrit
-                }
-                else {
-                    fprintf(stderr, "Spatny operator\n");
-                    return S_SYNTAKTICKA_CHYBA;
-                }
-            }
-            else {
-                fprintf(stderr, "Chybi operator\n");
-                return S_SYNTAKTICKA_CHYBA;
-            }
-        }
-
-        /** Pravidlo E -> (E) */
+           /** Pravidlo E -> (E) */
         else if (prectiTerminal.symbol == LZAVORKA) {
             if (!zasobnikEmpty(zasobnik2)) {
                 zasobnikPrectiVrchol(zasobnik2, &prectiTerminal2);
@@ -397,14 +361,11 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
                     if (zasobnikEmpty(zasobnik2)) {
                         zasobnikPop(zasobnik1);             /** Odstraneni < zarazky */
 
-
-                        neterminal = prectiTerminal2;
+                        //neterminal = prectiTerminal2;
                         neterminal.symbol = NETERMINAL;
 
-                        printf("u zavorek: %d", prectiTerminal2.polozkaTS.data.intNumber);
-
                         /** Vlozeni do TS */
-                        htInsert(neterminal.polozkaTS.key, neterminal.polozkaTS.data, neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
+                        //htInsert(neterminal.polozkaTS.key, neterminal.polozkaTS.data, neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
 
                         /** Po redukci vlozime neterminal E do prvniho zasobniku */
                         zasobnikPush(zasobnik1, neterminal);
@@ -425,9 +386,66 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
                 return S_SYNTAKTICKA_CHYBA;
             }
         }
-        else {
-            fprintf(stderr, "Na zasobniku jsou polozky, ktere tam nemaji co delat\n");
-            return S_SYNTAKTICKA_CHYBA;
+
+            /** Pravidlo E -> E operator E */
+        else if (prectiTerminal.symbol == NETERMINAL) {
+            if(!zasobnikEmpty(zasobnik2)) {
+                zasobnikPrectiVrchol(zasobnik2, &prectiTerminal2);
+                zasobnikPop(zasobnik2);
+            }
+            else {
+                fprintf(stderr, "Chybi operator\n");
+                return S_SYNTAKTICKA_CHYBA;
+            }
+
+                /** Za neterminalem E je operator */
+            if ((prectiTerminal2.symbol == PLUS) || (prectiTerminal2.symbol== MINUS) || (prectiTerminal2.symbol == KRAT) || (prectiTerminal2.symbol == DELENO) ||
+                    (prectiTerminal2.symbol == MENSI) || (prectiTerminal2.symbol == VETSI) || (prectiTerminal2.symbol == MENSIROVNO) ||
+                    (prectiTerminal2.symbol == VETSIROVNO) || (prectiTerminal2.symbol == ROVNO) || (prectiTerminal2.symbol == NEROVNO)) {
+
+                            /** Zjisteni operatoru */
+                        operace = zjistiOperator(prectiTerminal2.symbol);
+            }
+            else {
+                fprintf(stderr, "Spatny operator\n");
+                return S_SYNTAKTICKA_CHYBA;
+            }
+
+            if (!zasobnikEmpty(zasobnik2)) {
+                zasobnikPrectiVrchol(zasobnik2, &prectiTerminal3);
+                zasobnikPop(zasobnik2);
+            }
+            else {
+                fprintf(stderr, "Chybi E\n");
+                return S_SYNTAKTICKA_CHYBA;
+            }
+
+            if (prectiTerminal3.symbol == NETERMINAL) {
+                if (zasobnikEmpty(zasobnik2)) {
+                    zasobnikPop(zasobnik1);     // odstraneni < zarazky
+
+                    if ((operace == PLUS) || (operace == MINUS) || (operace == KRAT) || (operace == DELENO)) {
+
+                        generateVariable(&newVar);
+                        neterminal.polozkaTS.key = allocString(newVar.data);
+                        //neterminal = prectiTerminal3;     // v prectiT3 je vysledek
+                        neterminal.symbol = NETERMINAL;
+
+                        zasobnikPush(zasobnik1, neterminal);
+
+                        /** Vlozeni do TS */
+                        htInsert(neterminal.polozkaTS.key, neterminal.polozkaTS.data, neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
+
+                        /** Vlozeni instrukce do seznamu */
+                        generateInstruction(operace, htSearch(prectiTerminal.polozkaTS.key), htSearch(prectiTerminal3.polozkaTS.key), htSearch(neterminal.polozkaTS.key));
+                        return S_BEZ_CHYB;
+                    }
+                }
+                else {
+                    fprintf(stderr, "Za E operator E jsou dalsi polozky\n");
+                    return S_SYNTAKTICKA_CHYBA;
+                }
+            }
         }
     }
     else {

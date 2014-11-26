@@ -43,7 +43,13 @@ typedef enum {
     OC_ADD,
     OC_SUB,
     OC_MUL,
-    OC_DIV
+    OC_DIV,
+    OC_MENSI,
+    OC_VETSI,
+    OC_MENSI_ROVNO,
+    OC_VETSI_ROVNO,
+    OC_ROVNO,
+    OC_NEROVNO
 } TOpCode;
 
 tList listIntrukci;
