@@ -229,7 +229,7 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
 
 tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
     tData presyp;               /** Pomocna promenna na presunuti terminalu mezi zasobniky */
-    TOpCode operace;
+    int operace;
     tData hledameZarazku;       /** Potrebujeme najit na zasobniku < */
     zasobnikPrectiVrchol(zasobnik1, &hledameZarazku);
 
@@ -253,7 +253,12 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
 
             neterminal = prectiTerminal;
             neterminal.symbol = NETERMINAL;                         /** Prepiseme na neterminal */
-            zasobnikPush(zasobnik1, neterminal);                    /** Po redukci vlozime neterminal E na prvni zasobnik */
+
+            /** Vlozeni do TS */
+            htInsert(neterminal.polozkaTS.key, neterminal.polozkaTS.data, neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
+
+            /** Po redukci vlozime neterminal E na prvni zasobnik */
+            zasobnikPush(zasobnik1, neterminal);
             return S_BEZ_CHYB;
         }
 
@@ -276,7 +281,6 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
                         else if (prectiTerminal2.symbol == MINUS) {
                             operace = OC_SUB;
                         }
-
                         else if (prectiTerminal2.symbol == KRAT) {
                             operace = OC_MUL;
                         }
@@ -294,12 +298,15 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
                         return S_SYNTAKTICKA_CHYBA;
                     }
                         /** Aritmeticke operatory */
-                    if ((prectiTerminal2.symbol == PLUS) || (prectiTerminal2.symbol == MINUS) || (prectiTerminal2.symbol == KRAT) || (prectiTerminal2.symbol == DELENO)) {
+                    //if ((prectiTerminal2.symbol == PLUS) || (prectiTerminal2.symbol == MINUS) || (prectiTerminal2.symbol == KRAT) || (prectiTerminal2.symbol == DELENO)) {
+
+                    if ((operace == PLUS) || (operace == MINUS) || (operace == KRAT) || (operace == DELENO)) {
                         if (prectiTerminal3.symbol == NETERMINAL) {
                             if (zasobnikEmpty(zasobnik2)) {
                                 zasobnikPop(zasobnik1);     // odstraneni < zarazky
 
-                                neterminal = prectiTerminal3;
+                                //neterminal = prectiTerminal3;
+
                                 generateVariable(&newVar);
                                 neterminal.polozkaTS.key = allocString(newVar.data);
                                 neterminal.symbol = NETERMINAL;
@@ -309,10 +316,7 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
                                 /** Vlozeni do TS */
                                 htInsert(neterminal.polozkaTS.key, neterminal.polozkaTS.data, neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
 
-
                                 /** Vlozeni instrukce do seznamu */
-printf("OP1 %s\n", prectiTerminal.polozkaTS.key);
-printf("OP2 %s\n", prectiTerminal3.polozkaTS.key);
                                 generateInstruction(operace, htSearch(prectiTerminal.polozkaTS.key), htSearch(prectiTerminal3.polozkaTS.key), htSearch(neterminal.polozkaTS.key));
 
                                 return S_BEZ_CHYB;
@@ -331,7 +335,7 @@ printf("OP2 %s\n", prectiTerminal3.polozkaTS.key);
                             if (zasobnikEmpty(zasobnik2)) {
                                 zasobnikPop(zasobnik1);             /** Odstraneni < zarazky */
 
-                                neterminal = prectiTerminal3;
+                                //neterminal = prectiTerminal3;
                                 generateVariable(&newVar);
                                 neterminal.polozkaTS.key = allocString(newVar.data);
                                 neterminal.symbol = NETERMINAL;
@@ -392,8 +396,17 @@ printf("OP2 %s\n", prectiTerminal3.polozkaTS.key);
                 if (prectiTerminal3.symbol == PZAVORKA) {
                     if (zasobnikEmpty(zasobnik2)) {
                         zasobnikPop(zasobnik1);             /** Odstraneni < zarazky */
-                        neterminal = prectiTerminal3;       // k tomuto se jeste vratit
+
+
+                        neterminal = prectiTerminal2;
+
+                        //neterminal = prectiTerminal3;
                         neterminal.symbol = NETERMINAL;
+
+                        /** Vlozeni do TS */
+                        htInsert(neterminal.polozkaTS.key, neterminal.polozkaTS.data, neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
+
+                        /** Po redukci vlozime neterminal E do prvniho zasobniku */
                         zasobnikPush(zasobnik1, neterminal);
                         return S_BEZ_CHYB;
                     }

@@ -13,7 +13,6 @@
 
 TItem* UNDEFPTR;
 
-
 void htPrintTable() {
 int maxlen = 0;
 int sumcnt = 0;
@@ -55,28 +54,29 @@ void printdata( TItem *tmp ){
         printf("retezec: %s\n", tmp->data.str );
     }
 	else if( tmp->type == 1 ){
-        printf("Bool hodnota: %s\n", tmp->data.boolValue ? "true" : "false");
+        printf("boolean: %s\n", tmp->data.boolValue ? "true" : "false");
     }
     else if( tmp->type == 2 ){
-        printf("Intcislo: %d\n", tmp->data.intNumber );
+        printf("integer: %d\n", tmp->data.intNumber );
     }
     else if( tmp->type == 3 ){
-        printf("Intcislo: %lf\n", tmp->data.floatNumber );
+        printf("double: %lf\n", tmp->data.floatNumber );
     }
 }
 
 void printList () {
     while (listIntrukci.First != NULL) {
 
-        printf("V listu je := %d\n", listIntrukci.First->instruction.instructionType);
+        printf("V listu je operace %d\n", listIntrukci.First->instruction.instructionType);
+        printf("Operand 1\n");
         TItem *tmp = (TItem*)listIntrukci.First->instruction.address1;
         printdata(tmp);
+        printf("Operand 2\n");
         tmp = (TItem*)listIntrukci.First->instruction.address2;
         printdata(tmp);
         listIntrukci.First = listIntrukci.First->nextItem;
     }
 }
-
 
 int main (int argc, char *argv[]) {
 
@@ -117,8 +117,45 @@ int main (int argc, char *argv[]) {
     else
         printf("Syntakticka analyza NO\n");
 
-    printList();
+    //printList();
 
+    while (listIntrukci.First != NULL) {
+
+        TItem *tmp1 = (TItem*)listIntrukci.First->instruction.address1;
+        TItem *tmp2 = (TItem*)listIntrukci.First->instruction.address2;
+        TItem *tmp3 = (TItem*)listIntrukci.First->instruction.address3;
+
+
+        switch(listIntrukci.First->instruction.instructionType) {
+
+            case OC_ADD:
+                if (tmp1->type == TYPEINT && tmp2->type == TYPEINT) {
+                    tmp3->data.intNumber = tmp1->data.intNumber + tmp2->data.intNumber;
+                    printf("Scitani: operand1 %d, operand2 %d\n", tmp1->data.intNumber, tmp2->data.intNumber);
+                }
+                break;
+
+            case OC_SUB:
+                if (tmp1->type == TYPEINT && tmp2->type == TYPEINT) {
+                    tmp3->data.intNumber = tmp1->data.intNumber - tmp2->data.intNumber;
+                    printf("Odcitani: operand1 %d, operand2 %d\n", tmp1->data.intNumber, tmp2->data.intNumber);
+                }
+                break;
+
+            case OC_MUL:
+                if (tmp1->type == TYPEINT && tmp2->type == TYPEINT) {
+                    tmp3->data.intNumber = tmp1->data.intNumber * tmp2->data.intNumber;
+                    printf("Nasobeni: operand1 %d, operand2 %d\n", tmp1->data.intNumber, tmp2->data.intNumber);
+                }
+                break;
+        }
+
+        printf("vysledek je: %d\n", tmp3->data.intNumber);
+
+
+        /** Posun na dalsi instrukci */
+        listIntrukci.First = listIntrukci.First->nextItem;
+    }
 
     //htPrintTable();
 
