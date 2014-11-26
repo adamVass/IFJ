@@ -326,9 +326,6 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
             neterminal = prectiTerminal;
             neterminal.symbol = NETERMINAL;                         /** Prepiseme na neterminal */
 
-            /** Vlozeni do TS */
-            //htInsert(neterminal.polozkaTS.key, neterminal.polozkaTS.data, neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
-
             /** Po redukci vlozime neterminal E na prvni zasobnik */
             zasobnikPush(zasobnik1, neterminal);
             return S_BEZ_CHYB;
@@ -361,11 +358,7 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
                     if (zasobnikEmpty(zasobnik2)) {
                         zasobnikPop(zasobnik1);             /** Odstraneni < zarazky */
 
-                        //neterminal = prectiTerminal2;
                         neterminal.symbol = NETERMINAL;
-
-                        /** Vlozeni do TS */
-                        //htInsert(neterminal.polozkaTS.key, neterminal.polozkaTS.data, neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
 
                         /** Po redukci vlozime neterminal E do prvniho zasobniku */
                         zasobnikPush(zasobnik1, neterminal);
@@ -411,6 +404,7 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
                 return S_SYNTAKTICKA_CHYBA;
             }
 
+                /** Jako posledni v tomto pravidle musi byt znovu neterminal */
             if (!zasobnikEmpty(zasobnik2)) {
                 zasobnikPrectiVrchol(zasobnik2, &prectiTerminal3);
                 zasobnikPop(zasobnik2);
@@ -424,11 +418,29 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
                 if (zasobnikEmpty(zasobnik2)) {
                     zasobnikPop(zasobnik1);     // odstraneni < zarazky
 
+                        /** Vygenerovani instrukce pro aritmeticke operatory */
                     if ((operace == PLUS) || (operace == MINUS) || (operace == KRAT) || (operace == DELENO)) {
 
                         generateVariable(&newVar);
                         neterminal.polozkaTS.key = allocString(newVar.data);
-                        //neterminal = prectiTerminal3;     // v prectiT3 je vysledek
+                        neterminal.symbol = NETERMINAL;
+
+                        zasobnikPush(zasobnik1, neterminal);
+
+                        /** Vlozeni do TS */
+                        htInsert(neterminal.polozkaTS.key, neterminal.polozkaTS.data, neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
+
+                        /** Vlozeni instrukce do seznamu */
+                        generateInstruction(operace, htSearch(prectiTerminal.polozkaTS.key), htSearch(prectiTerminal3.polozkaTS.key), htSearch(neterminal.polozkaTS.key));
+                        return S_BEZ_CHYB;
+                    }
+
+                        /** Vygenerovani instrukce pro relacni operatory */
+                    if ((operace == MENSI) || (operace == VETSI) || (operace == MENSIROVNO) ||
+                        (operace == VETSIROVNO) || (operace == ROVNO) || (operace == NEROVNO)) {
+
+                        generateVariable(&newVar);
+                        neterminal.polozkaTS.key = allocString(newVar.data);
                         neterminal.symbol = NETERMINAL;
 
                         zasobnikPush(zasobnik1, neterminal);
@@ -494,8 +506,9 @@ tChyba precedencniSA() {
         akce = precedencniTabulka[nejvrchTermSymbol.symbol][prevedenyToken.symbol];
 
         /** Po dokonceni syntakticke analyzy vstupniho retezce opoustime cyklus */
-        if ((prevedenyToken.symbol == DOLAR) && (nejvrchTermSymbol.symbol == DOLAR))
+        if ((prevedenyToken.symbol == DOLAR) && (nejvrchTermSymbol.symbol == DOLAR)) {
             break;
+        }
 
         switch (akce) {
 

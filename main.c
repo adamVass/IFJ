@@ -11,43 +11,7 @@
 #include "ilist.h"
 //#include "syntakticka_analyza.h"
 
-TItem* UNDEFPTR;
 
-void htPrintTable() {
-int maxlen = 0;
-int sumcnt = 0;
-printf ("------------HASH TABLE--------------\n");
-for ( int i=0; i<HTSIZE; i++ ) {
-printf ("%i:",i);
-int cnt = 0;
-TItem* ptr = (*ptrht)[i];
-while ( ptr != NULL ) {
-printf (" (%s)",ptr->key); // vytiskne klic
-if( ptr->type == 0 ){ // string
-printf(" %s", ptr->data.str);
-}
-else if( ptr->type == 1 ){ // bool
-printf(" %d", ptr->data.boolValue);
-}
-else if( ptr->type == 2 ){ // int
-printf(" %d", ptr->data.intNumber);
-}
-else if( ptr->type == 3 ){ // double
-printf(" %f", ptr->data.floatNumber);
-}
-if ( ptr != UNDEFPTR )
-cnt++;
-ptr = ptr->ptrnext;
-}
-printf ("\n");
-if (cnt > maxlen)
-maxlen = cnt;
-sumcnt+=cnt;
-}
-printf ("------------------------------------\n");
-printf ("Items count %i The longest list %i\n",sumcnt,maxlen);
-printf ("------------------------------------\n");
-}
 
 void printdata( TItem *tmp ){
     if( tmp->type == 0 ){
@@ -148,14 +112,43 @@ int main (int argc, char *argv[]) {
                     printf("Nasobeni: operand1 %d, operand2 %d\n", tmp1->data.intNumber, tmp2->data.intNumber);
                 }
                 break;
+
+            case OC_DIV:
+                if (tmp1->type == TYPEINT && tmp2->type == TYPEINT) {
+                    tmp3->type = TYPEDOUBLE;
+                    tmp3->data.floatNumber = (double) tmp1->data.intNumber / (double) tmp2->data.intNumber;
+                }
+                else if (tmp1->type == TYPEDOUBLE && tmp2->type == TYPEDOUBLE) {
+                    tmp3->type = TYPEDOUBLE;
+                    tmp3->data.floatNumber = (double) tmp1->data.floatNumber / (double) tmp2->data.floatNumber;
+                }
+                else if (tmp1->type == TYPEDOUBLE && tmp2->type == TYPEINT) {
+                    tmp3->type = TYPEDOUBLE;
+                    tmp3->data.floatNumber = (double) tmp1->data.floatNumber / (double) tmp2->data.intNumber;
+                }
+                else if (tmp1->type == TYPEINT && tmp2->type == TYPEDOUBLE) {
+                    tmp3->type = TYPEDOUBLE;
+                    tmp3->data.floatNumber = (double) tmp1->data.intNumber / (double) tmp2->data.floatNumber;
+                }
+                break;
         }
-
-        printf("vysledek je: %d\n", tmp3->data.intNumber);
-
 
         /** Posun na dalsi instrukci */
         listIntrukci.First = listIntrukci.First->nextItem;
     }
+
+        /** Takto se pristupuje k vysledku vyrazu */
+        TItem *vysledek = htSearch(neterminal.polozkaTS.key);
+
+        if (vysledek->type == TYPEINT) {
+            printf("Vysledek typu int %d\n", vysledek->data.intNumber);
+        }
+        else if (vysledek->type == TYPEBOOL) {
+            printf("Vysledek typu boolean %d\n", vysledek->data.boolValue);
+        }
+        else if (vysledek->type == TYPEDOUBLE) {
+            printf("Vysledek typu double %lf\n", vysledek->data.floatNumber);
+        }
 
     //htPrintTable();
 
