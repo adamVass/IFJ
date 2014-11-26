@@ -5,14 +5,16 @@
 /**  email: xfajku05@stud.fit.vutbr.cz  */
 /****************************************/
 
-#ifndef SYN.h
-#define SYN.h
+#ifndef _SYN_H_
+#define _SYN_H_
 
 
 #include "precedencni_analyza.h"
 #include "frame.h"
 
 int syntakticka_anal();
+tChyba DTYPE2();
+tChyba DRUH();
 tChyba FUNKCE();
 tChyba PARAMS();
 tChyba DTYPE();
@@ -26,5 +28,7 @@ tChyba VESTAV();
 tChyba LEXEM();
 tChyba CYKLUS();
 tChyba TERM();
+tChyba UKONCOVACI();
+tChyba DOPREDNE();
 
 #endif

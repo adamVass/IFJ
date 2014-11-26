@@ -13,9 +13,12 @@
 #include <stdbool.h>
 #include "syntakticka_analyza.h"
 
+
 //deklarace funkci, ktere budou zmineny driv, nez budou implementovany
 int dtype;
 TData dat;
+bool init;
+bool prirovnani;
 
 char* id;
 char* funkce;
@@ -39,6 +42,51 @@ tChyba TERM();
 tChyba UKONCOVACI();
 tChyba DOPREDNE();
 
+void htPrintTable( tHTable *ptrht ) {
+	int maxlen = 0;
+	int sumcnt = 0;
+	printf ("------------HASH TABLE--------------\n");
+	for ( int i=0; i<HTSIZE; i++ ) {
+	printf ("%i:",i);
+	int cnt = 0;
+	TItem* ptr = (*ptrht)[i];
+	while ( ptr != NULL ) {
+	printf (" (%s)",ptr->key); // vytiskne klic
+	if( ptr->druh == 5 ){ // string
+	printf(" %d ", ptr->druh);
+
+	for (int i = 0; i < ptr->data.param.numParam; i++){
+		printf("%s ", ptr->data.param.param[i]);
+		
+	}
+}
+else if( ptr->druh == 6 ){ // bool
+printf(" %d", ptr->druh);
+}
+else if( ptr->druh == 7 ){ // int
+printf(" %d", ptr->druh);
+}
+else if( ptr->druh == 8 ){ // double
+
+printf(" %d", ptr->druh);
+}
+cnt++;
+ptr = ptr->ptrnext;
+}
+printf ("\n");
+if (cnt > maxlen)
+maxlen = cnt;
+sumcnt+=cnt;
+}
+printf ("------------------------------------\n");
+printf ("Items count %i The longest list %i\n",sumcnt,maxlen);
+printf ("------------------------------------\n");
+}
+
+
+
+
+
 tChyba PROGRAM () {					//funkce na pravidlo PROGRAM -> FUNKCE . eof
 							//nacitani prvniho tokenu je v komentu, protoze na konci je pomocna funkce, kde se uz nacita token, pri vyslednem kodu, bude toto nacteni tokenu odkomentovano
 	/*token = getNextToken();
@@ -46,6 +94,11 @@ tChyba PROGRAM () {					//funkce na pravidlo PROGRAM -> FUNKCE . eof
 		return S_LEXIKALNI_CHYBA;
 	}*/
 	int analyza;					//lokalni promenna, do ktere se bude nacitat vystup z volane funkce a v pripade chyby se bude obsah promenne vracet
+	
+	int ret = initFrames();
+	if(ret != S_BEZ_CHYB ) {
+		return S_INTERNI_CHYBA;
+	}
 
 	if(token.stav == s_klicove && (!strcmp(token.data, "function") || !strcmp(token.data, "var") || !strcmp(token.data, "begin"))) {
 							//podminka kde se kontroluje, zda nacteny token je klicove slovo a nasledne se rozhodne, ktere konkretne. Pote dojde k zavolani funkce FUNKCE, kde jsou 3 pravidla, ktere zacinaji terminala vyse
@@ -71,7 +124,7 @@ tChyba PROGRAM () {					//funkce na pravidlo PROGRAM -> FUNKCE . eof
 
 tChyba FUNKCE() {
 	int analyza;					//opet lokalni promenna, stejna funkce jako ve funkci nahore
-
+	TItem *nasel;
 	if(!strcmp(token.data, "begin") && token.stav == s_klicove) {
 		token = getNextToken();			//pres strcmp porovnavam data tokenu (prakticky primo to, co se nacte)
 		if(token.stav == s_lex_error) {
@@ -85,6 +138,7 @@ tChyba FUNKCE() {
 		return S_BEZ_CHYB;
 	}
 	else if(!strcmp(token.data, "function") && token.stav == s_klicove) {
+		
 		token = getNextToken();
 		if(token.stav == s_lex_error) {
 			return S_LEXIKALNI_CHYBA;
@@ -98,7 +152,14 @@ tChyba FUNKCE() {
 			
 			dat.param.numParam = 0;
 			strcpy(funkce, token.data);
-			htInsert(funkce,dat, 4,0);			
+			nasel = htSearch(ptrhtGlobal,funkce);
+			if(nasel != NULL ) {
+				if(nasel->init == false) {
+					return S_SEMANTICKA_CHYBA_NEDEF;
+				}
+			}
+
+			htInsert(ptrhtGlobal,funkce,dat, 4,0);	
 			token = getNextToken();
 			if(token.stav == s_lex_error) {
 			return S_LEXIKALNI_CHYBA;
@@ -138,9 +199,6 @@ tChyba FUNKCE() {
 					else if(!strcmp(token.data, "boolean")) {
 						dtype = TYPEBOOL;
 					}
-
-					htCompleteInsert(funkce, ID_FUNCTION, dtype);
-					free(funkce);
 					
 					token = getNextToken();
 					if(token.stav == s_lex_error) {
@@ -158,13 +216,32 @@ tChyba FUNKCE() {
 							return analyza;
 						}
 
-						else if(token.stav == s_strednik) {
+						
+						if(init == true) {
+							htCompleteInsert(ptrhtGlobal,funkce, ID_FUNCTION, dtype, true);
+							free(funkce);
+							
+						}
+						else if (init == false) {
+							htCompleteInsert(ptrhtGlobal,funkce, ID_FUNCTION, dtype, false);	
+							free(funkce);
+
+						}
+
+						if(token.stav == s_strednik) {
+							htPrintTable( ptrhtLocal );
+							if(init == false) {
+							popFrame();
+							}
+							init = false;
+
 							token = getNextToken();
 							if(token.stav == s_lex_error) {
 								return S_LEXIKALNI_CHYBA;
-							}
+							}								//volani interpretu
 							return FUNKCE();
 						}
+
 								//jakmile je vse splneno, vola funkce sama sebe znovu, protoze podle pravidel, jakmile se dojede na konec, tak je potreba zavolat FUNKCE() znovu, protoze napriklad funkci muze byt v kodu deklarovano mnoho a ne jen jedna
 						
 					}
@@ -226,7 +303,7 @@ tChyba PARAMS() {
 				dtype = TYPEBOOL;
 			}
 			
-			htParamInsert(funkce, params, dtype);
+			htParamInsert(ptrhtGlobal,funkce, params, dtype);
 			free(params);		
 			token = getNextToken();
 			if(token.stav == s_lex_error) {
@@ -279,7 +356,7 @@ tChyba PARAMS() {
 					dtype = TYPEBOOL;
 				}
 					
-				htParamInsert(funkce, params, dtype);
+				htParamInsert(ptrhtGlobal,funkce, params, dtype);
 				free(params);
 				token = getNextToken();
 				if(token.stav == s_lex_error) {
@@ -492,7 +569,9 @@ tChyba VESTAV() {
 }
 
 tChyba DOPREDNE() {
+	int ret;
 	if(!strcmp(token.data, "forward") && token.stav == s_klicove) {			
+		init = true;
 		token = getNextToken();
 		if(token.stav == s_lex_error) {
 			return S_LEXIKALNI_CHYBA;
@@ -500,30 +579,15 @@ tChyba DOPREDNE() {
 		return S_BEZ_CHYB;
 	}
 	else
-		return ACT_LIST();
+		ret = pushFrame();
+		if(ret != S_BEZ_CHYB) {
+			return ret;
+		}
+
+	return ACT_LIST();
 }
 
 
-tChyba FORW() {
-	if(!strcmp(token.data, "forward") && token.stav == s_klicove) {
-		token = getNextToken();
-		if(token.stav == s_lex_error) {
-			return S_LEXIKALNI_CHYBA;
-		}
-
-		if(token.stav == s_strednik) {
-			token = getNextToken();
-			if(token.stav == s_lex_error) {
-				return S_LEXIKALNI_CHYBA;
-			}
-			return S_BEZ_CHYB;
-		}
-	}
-	else if((!strcmp(token.data, "begin") || !strcmp(token.data, "var") || !strcmp(token.data, "if") || !strcmp(token.data, "end") || !strcmp(token.data, "while") || !strcmp(token.data, "readln") || !strcmp(token.data, "write")) || (token.stav == s_identifikator)) {
-		return S_BEZ_CHYB;	//zde je prakticky udelan epsilon. Pokud nasledujici token je jeden z vyse uvedenych, je funkce FORW epsilon a tudiz vracime OK.
-	}
-	return S_SYNTAKTICKA_CHYBA;
-}
 
 tChyba DTYPE2() {
 	if(token.stav == s_cele_cislo) {
@@ -570,9 +634,10 @@ tChyba DTYPE() {
 }
 
 tChyba ROZHODNI() {
-	int analyza1;
+	
 	int analyza2;
 	int analyza;
+	int analyza1;
 	TItem *pt;
 	if((analyza = DTYPE()) == S_BEZ_CHYB) {
 		token = getNextToken();
@@ -589,7 +654,9 @@ tChyba ROZHODNI() {
 		}
 			
 		if(token.stav == s_identifikator) {
-			pt = htSearch(token.data);
+					
+			pt = searchFrames(token.data);
+			
 			if(pt != NULL) {
 				analyza1 = PROM();
 				if(analyza1 != S_BEZ_CHYB) {
@@ -621,6 +688,7 @@ tChyba ROZHODNI() {
 
 tChyba LEXEM() {
 	if(token.stav == s_prirazeni) {
+		prirovnani = true;
 		token = getNextToken();
 		if(token.stav == s_lex_error) {
 			return S_LEXIKALNI_CHYBA;
@@ -663,6 +731,8 @@ tChyba UKONCOVACI() {
 
 tChyba ACT_LIST() {
 	int analyza;
+	int dtype2=0;
+	TItem *pt;
 	if(!strcmp(token.data, "end") && token.stav == s_klicove) {
 		token = getNextToken();
 		if(token.stav == s_lex_error) {
@@ -678,6 +748,11 @@ tChyba ACT_LIST() {
 		return ACT_LIST();
 	}
 	else if(token.stav == s_identifikator) {
+		if((id = malloc(strlen(token.data)+1)) == NULL)	{
+				return S_INTERNI_CHYBA;
+			}
+		
+		strcpy(id, token.data);	
 		token = getNextToken();
 		if(token.stav == s_lex_error) {
 			return S_LEXIKALNI_CHYBA;
@@ -687,13 +762,41 @@ tChyba ACT_LIST() {
 		if(analyza != S_BEZ_CHYB) {
 			return analyza;
 		}
+		
+		if(prirovnani == true) {
+			pt = searchFrames( id );
+			if(pt != NULL) {
+				pt->init = true;
+				prirovnani = false;
+			}
+			else {
+				return S_SEMANTICKA_CHYBA_NEDEF;
+			}
+		}
+
+		if(!strcmp(token.data, "integer")) {
+			dtype2 = TYPEINT;
+		}
+		else if(!strcmp(token.data, "string")) {
+			dtype2 = TYPESTR;
+		}
+		else if(!strcmp(token.data, "real")) {
+			dtype2 = TYPEDOUBLE;
+		}
+		else if(!strcmp(token.data, "boolean")) {
+			dtype2 = TYPEBOOL;
+		}
 
 		analyza = ROZHODNI();
 		if(analyza != S_BEZ_CHYB) {
 			return analyza;
 		}
 		
-			
+		if(dtype2 != 0) {
+			htDeclInsert(ptrhtLocal,id, dtype2, ID_LOCAL);
+			free(id);
+		}
+		
 		analyza = UKONCOVACI();
 		if(analyza != S_BEZ_CHYB) {
 			return analyza;
@@ -710,7 +813,7 @@ tChyba ACT_LIST() {
 			if((id = malloc(strlen(token.data)+1)) == NULL)	{
 				return S_INTERNI_CHYBA;
 			}
-		
+			
 			strcpy(id, token.data);		
 			token = getNextToken();
 			if(token.stav == s_lex_error) {
@@ -742,7 +845,7 @@ tChyba ACT_LIST() {
 				}
 			
 					
-				htDeclInsert(id, dtype, ID_LOCAL);
+				htDeclInsert(ptrhtLocal,id, dtype, ID_LOCAL);
 				free(id);
 				
 				token = getNextToken();
@@ -937,7 +1040,7 @@ tChyba DEKLARACE() {
 			}
 			
 					
-			htDeclInsert(id, dtype, ID_GLOBAL);
+			htDeclInsert(ptrhtGlobal,id, dtype, ID_GLOBAL);
 			free(id);
 		
 			token = getNextToken();

@@ -5,7 +5,7 @@
 
 typedef struct TStackItem{
 	tHTable *ptrht;
-	TStackItem *lower;
+	struct TStackItem *lower;
 }TStackItem;
 
 typedef struct TStack{
@@ -21,6 +21,8 @@ tChyba initStack();
 tChyba pushFrame();
 
 tChyba popFrame();
+
+TItem* searchFrames( char *key );
 
 
 #endif

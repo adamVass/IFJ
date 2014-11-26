@@ -2,7 +2,7 @@
 
 int HTSIZE = MAX_HTSIZE;
 
-tChyba htCompleteInsert( tHTable *ptrht, char *key, int druh, int type )
+tChyba htCompleteInsert( tHTable *ptrht, char *key, int druh, int type, bool init )
 {
 	TItem *tmp = (*ptrht)[hashCode(key)];
 	if( !tmp ){
@@ -10,6 +10,7 @@ tChyba htCompleteInsert( tHTable *ptrht, char *key, int druh, int type )
 	}
 	tmp->druh = druh;
 	tmp->type = type;
+	tmp->init = init;
 	return S_BEZ_CHYB; 
 }
 

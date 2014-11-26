@@ -64,11 +64,22 @@ tChyba popFrame()
 	//posunuti vrcholu
 	ptrStack->top = ptrStack->top->lower;
 	//nova ht v local ukazateli
-	ptrhtLocal = ptrStack->top;
+	ptrhtLocal = ptrStack->top->ptrht;
 	int ret = htClearAll( tmp->ptrht );
 	if( ret == S_INTERNI_CHYBA ){
 		return S_INTERNI_CHYBA;
 	}
 	free(tmp);
 	return S_BEZ_CHYB;
+}
+
+
+TItem* searchFrames( char *key )
+{
+
+	TItem *tmp = htSearch( ptrhtLocal, key );
+	if( !tmp ){
+		tmp = htSearch( ptrhtGlobal, key );
+	}
+	return tmp;
 }

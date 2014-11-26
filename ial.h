@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include "navratova_hodnota.h"
 
 #define MAX_HTSIZE 61
 
@@ -44,6 +45,7 @@ typedef union TData{
    TData data;          /* obsah */
    int type;
    int druh;
+   bool init;           /*deklarovana/nedeklarovana a inicializovana a neicializovana*/
    struct TItem* ptrnext;  /* ukazatel na další synonymum */
 } TItem;
 
@@ -67,7 +69,7 @@ extern int HTSIZE;
 /* Hlavičky řešených procedur a funkcí. */
 
 
-tChyba htCompleteInsert( tHTable *ptrht, char *key, int druh, int type );
+tChyba htCompleteInsert( tHTable *ptrht, char *key, int druh, int type, bool init );
 
 tChyba htParamInsert( tHTable *ptrht, char *key, char *param, int type );
 
