@@ -291,3 +291,42 @@ char *strCopy(char *str, unsigned int s, unsigned int n)
 	strncpy(result, str + s - 1, n);	/* (str + s) - to begin from start index, -1 as indexing starts from 1 */
 	return result;
 }
+
+char *strSort(char *str)
+{
+	int right = strlen(str) - 1;
+	if (right > 0)
+		quickSort(str, 0, right); /* left = 0 */
+
+	return str;
+}
+
+void quickSort(char *str, int left, int right)
+{	
+	int i = left, j = right;
+	int pm = str[(i + j)/2];
+	int temp;
+
+	do
+	{
+		while (str[i] < pm)
+			i++;
+
+		while (str[j] > pm)
+			j--;
+
+		if (i <= j)
+		{
+			temp = str[i];
+			str[i] = str[j];
+			str[j] = temp;
+			i++;
+			j--;
+		}
+	} while (i < j);
+
+	if (right > i)
+		quickSort(str, i, right);
+	if (j > left)
+		quickSort(str, left, j);
+}

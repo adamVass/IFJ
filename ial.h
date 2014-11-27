@@ -91,4 +91,8 @@ tChyba htClearAll( tHTable *ptrht );
 
 char *strCopy(char *str, unsigned int s, unsigned int n);
 
+char *strSort(char *str);
+
+void quickSort(char *str, int left, int right);
+
 #endif
