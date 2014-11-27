@@ -294,6 +294,10 @@ char *strCopy(char *str, unsigned int s, unsigned int n)
 
 char *strSort(char *str)
 {
+/** Define left and right bound, verify string's not empty
+* @param *str Array of characters to be sorted
+* @return Pointer to sorted array
+*/
 	int right = strlen(str) - 1;
 	if (right > 0)
 		quickSort(str, 0, right); /* left = 0 */
@@ -302,31 +306,36 @@ char *strSort(char *str)
 }
 
 void quickSort(char *str, int left, int right)
-{	
+{
+/** Recursive quick sort implementation
+* @param *str Array of characters to be sorted
+* @param left Left bound of the array
+* @param right Right bound of the array
+*/
 	int i = left, j = right;
-	int pm = str[(i + j)/2];
+	int pivot = str[(i + j)/2]; /* Pivot defined as pseudo median */
 	int temp;
 
 	do
 	{
-		while (str[i] < pm)
-			i++;
+		while (str[i] < pivot)
+			i++;		/* Incrementing until first i > pivot is found (from the left)*/
 
-		while (str[j] > pm)
-			j--;
+		while (str[j] > pivot)
+			j--;		/* Decremeting until first j < pivot is found (from the right)*/
 
 		if (i <= j)
 		{
 			temp = str[i];
 			str[i] = str[j];
-			str[j] = temp;
+			str[j] = temp;		/* Swapping found elements */
 			i++;
 			j--;
 		}
 	} while (i < j);
 
 	if (right > i)
-		quickSort(str, i, right);
+		quickSort(str, i, right);	/* Recursion to the right */
 	if (j > left)
-		quickSort(str, left, j);
+		quickSort(str, left, j);	/* Recursion to the left */
 }
