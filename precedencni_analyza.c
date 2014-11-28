@@ -172,22 +172,19 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
         prevedenyToken->symbol = LZAVORKA;
     else if (token.stav == s_identifikator) {
 
-        // zkontrolovat jestli se token.data nachazi v tabulce symbolu, jestli ne tak semanticka chyba
-        /*TItem *tmp = htSearch(ptrhtLocal, token.data);
-        prevedenyToken->polozkaTS.type = tmp->type;
-        prevedenyToken->polozkaTS.ptrnext = tmp->ptrnext;
-        prevedenyToken->polozkaTS.druh = tmp->druh;*/
-	TItem *tmp;
-	if ((tmp = searchFrames(token.data)) == NULL) {
-		fprintf(stderr, "Nedeklarovana promenna");
-		return S_SEMANTICKA_CHYBA_NEDEF;
-	}
-        prevedenyToken->symbol = ID;
-	prevedenyToken->polozkaTS.key = tmp->key;
-	prevedenyToken->polozkaTS.type = tmp->type;
-	prevedenyToken->polozkaTS.data = tmp->data;
-	prevedenyToken->polozkaTS.ptrnext = tmp->ptrnext;
-
+        /** kontrola, jestli se identifikator nachazi v tabulce
+            symbolu, jestli ne tak semanticka chyba */
+        TItem *tmp;
+        if ((tmp = searchFrames(token.data)) == NULL) {
+            fprintf(stderr, "Nedeklarovana promenna");
+            return S_SEMANTICKA_CHYBA_NEDEF;
+        } else {
+            prevedenyToken->symbol = ID;
+            prevedenyToken->polozkaTS.key = tmp->key;
+            prevedenyToken->polozkaTS.type = tmp->type;
+            prevedenyToken->polozkaTS.data = tmp->data;
+            prevedenyToken->polozkaTS.ptrnext = tmp->ptrnext;
+        }
     }
     else if (token.stav == s_prava_zavorka)
         prevedenyToken->symbol = PZAVORKA;
