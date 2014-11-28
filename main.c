@@ -83,7 +83,8 @@ int main (int argc, char *argv[]) {
 
     //printList();
 
-    interpret();
+    tChyba navr_kod = interpret();
+    printf("Navratovy kod interpretu: %d\n", navr_kod);
 
         /** Takto se pristupuje k vysledku vyrazu */
         TItem *vysledek = htSearch(ptrhtLocal, neterminal.polozkaTS.key);

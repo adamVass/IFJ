@@ -17,6 +17,8 @@ tChyba interpret() {
 
         switch(listIntrukci.First->instruction.instructionType) {
 
+            /** Aritmeticke instrukce */
+                /** Instrukce scitani */
             case OC_ADD:
                 if (tmp1->type == TYPEINT && tmp2->type == TYPEINT) {
                     tmp3->data.intNumber = tmp1->data.intNumber + tmp2->data.intNumber;
@@ -24,6 +26,7 @@ tChyba interpret() {
                 }
                 break;
 
+                /** Instrukce odcitani */
             case OC_SUB:
                 if (tmp1->type == TYPEINT && tmp2->type == TYPEINT) {
                     tmp3->data.intNumber = tmp1->data.intNumber - tmp2->data.intNumber;
@@ -31,6 +34,7 @@ tChyba interpret() {
                 }
                 break;
 
+                /** Instrukce nasobeni */
             case OC_MUL:
                 if (tmp1->type == TYPEINT && tmp2->type == TYPEINT) {
                     tmp3->data.intNumber = tmp1->data.intNumber * tmp2->data.intNumber;
@@ -38,6 +42,7 @@ tChyba interpret() {
                 }
                 break;
 
+                /** Instrukce deleni */
             case OC_DIV:
                 if (tmp1->type == TYPEINT && tmp2->type == TYPEINT) {
                     tmp3->type = TYPEDOUBLE;
@@ -57,6 +62,8 @@ tChyba interpret() {
                 }
                 break;
 
+            /** Realcni instrukce */
+                /** Instrukce rovno */
             case OC_ROVNO:
                 if (tmp1->type == TYPEINT && tmp2->type == TYPEINT) {
                     tmp3->type = TYPEBOOL;
@@ -67,6 +74,70 @@ tChyba interpret() {
                         tmp3->data.boolValue = false;
                     }
                 }
+                else if (tmp1->type == TYPEBOOL && tmp2->type == TYPEBOOL) {
+                    tmp3->type = TYPEBOOL;
+                    if (tmp1->data.boolValue == tmp2->data.boolValue) {
+                        tmp3->data.boolValue = true;
+                    }
+                    else {
+                        tmp3->data.boolValue = false;
+                    }
+                }
+                else if (tmp1->type == TYPEDOUBLE && tmp2->type == TYPEDOUBLE) {
+                    tmp3->type = TYPEBOOL;
+                    if (tmp1->data.floatNumber == tmp2->data.floatNumber) {
+                        tmp3->data.boolValue = true;
+                    }
+                    else {
+                        tmp3->data.boolValue = false;
+                    }
+                }
+                // pridat porovnani retezcu
+                else {
+                    /** Operandy nejsou stejneho typu, tudiz dojde k semanticke chybe c. 4 */
+                    tmp3->type = TYPEBOOL;
+                    tmp3->data.boolValue = false;
+                    return S_SEMANTICKA_CHYBA_TYPOVA;
+                }
+                break;
+
+                /** Instrukce nerovno */
+            case OC_NEROVNO:
+                if (tmp1->type == TYPEINT && tmp2->type == TYPEINT) {
+                    tmp3->type = TYPEBOOL;
+                    if (tmp1->data.intNumber != tmp2->data.intNumber) {
+                        tmp3->data.boolValue = true;
+                    }
+                    else {
+                        tmp3->data.boolValue = false;
+                    }
+                }
+                else if (tmp1->type == TYPEBOOL && tmp2->type == TYPEBOOL) {
+                    tmp3->type = TYPEBOOL;
+                    if (tmp1->data.boolValue != tmp2->data.boolValue) {
+                        tmp3->data.boolValue = true;
+                    }
+                    else {
+                        tmp3->data.boolValue = false;
+                    }
+                }
+                else if (tmp1->type == TYPEDOUBLE && tmp2->type == TYPEDOUBLE) {
+                    tmp3->type = TYPEBOOL;
+                    if (tmp1->data.floatNumber != tmp2->data.floatNumber) {
+                        tmp3->data.boolValue = true;
+                    }
+                    else {
+                        tmp3->data.boolValue = false;
+                    }
+                }
+                // pridat nerovno retezcu
+                else {
+                    /** Operandy nejsou stejneho typu, tudiz dojde k semanticke chybe c. 4 */
+                    tmp3->type = TYPEBOOL;
+                    tmp3->data.boolValue = false;
+                    return S_SEMANTICKA_CHYBA_TYPOVA;
+                }
+                break;
         }
 
         /** Posun na dalsi instrukci */
