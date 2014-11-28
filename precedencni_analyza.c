@@ -11,8 +11,9 @@
 #include "precedencni_analyza.h"
 #include "ilist.h"
 #include "mystring.h"
+#include "frame.h"
 
-TItem* UNDEFPTR;
+/*TItem* UNDEFPTR;
 
 void htPrintTable() {
     int maxlen = 0;
@@ -22,7 +23,7 @@ void htPrintTable() {
     for ( int i=0; i<HTSIZE; i++ ) {
         printf ("%i:",i);
         int cnt = 0;
-        TItem* ptr = (*ptrht)[i];
+        TItem* ptr = (*ptrhtGlobal)[i];
 
         while ( ptr != NULL ) {
             printf (" (%s)",ptr->key); // vytiskne klic
@@ -50,7 +51,7 @@ void htPrintTable() {
     printf ("------------------------------------\n");
     printf ("Items count %i The longest list %i\n",sumcnt,maxlen);
     printf ("------------------------------------\n");
-}
+}*/
 
 #define VELIKOST_TABULKY 14
 
@@ -172,11 +173,20 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
     else if (token.stav == s_identifikator) {
 
         // zkontrolovat jestli se token.data nachazi v tabulce symbolu, jestli ne tak semanticka chyba
-        /*TItem *tmp = htSearch(token.data);
+        /*TItem *tmp = htSearch(ptrhtLocal, token.data);
         prevedenyToken->polozkaTS.type = tmp->type;
         prevedenyToken->polozkaTS.ptrnext = tmp->ptrnext;
         prevedenyToken->polozkaTS.druh = tmp->druh;*/
+	TItem *tmp;
+	if ((tmp = searchFrames(token.data)) == NULL) {
+		fprintf(stderr, "Nedeklarovana promenna");
+		return S_SEMANTICKA_CHYBA_NEDEF;
+	}
         prevedenyToken->symbol = ID;
+	prevedenyToken->polozkaTS.key = tmp->key;
+	prevedenyToken->polozkaTS.type = tmp->type;
+	prevedenyToken->polozkaTS.data = tmp->data;
+	prevedenyToken->polozkaTS.ptrnext = tmp->ptrnext;
 
     }
     else if (token.stav == s_prava_zavorka)
@@ -208,7 +218,7 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
             prevedenyToken->polozkaTS.data.boolValue = false;
 
         /** Existenci v TS resit nemusime, protoze promenna ma unikatni nazev */
-        htInsert(prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
+        htInsert(ptrhtLocal, prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
 
     }
     else if (token.stav == s_string) {
@@ -223,7 +233,7 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
 
         prevedenyToken->polozkaTS.data.str = malloc(strlen(token.data)+1);
         strcpy(prevedenyToken->polozkaTS.data.str, token.data);
-        htInsert(prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
+        htInsert(ptrhtLocal, prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
 
     }
     else if (token.stav == s_cele_cislo) {
@@ -238,7 +248,7 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
         prevedenyToken->polozkaTS.druh = 0;
         prevedenyToken->polozkaTS.data.intNumber = atoi(token.data);
 
-        htInsert(prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
+        htInsert(ptrhtLocal, prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
 
 	}
     else if (token.stav == s_desetinne_cislo) {
@@ -252,7 +262,7 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
         prevedenyToken->polozkaTS.druh = 0;
         prevedenyToken->polozkaTS.data.floatNumber = atof(token.data);
 
-        htInsert(prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
+        htInsert(ptrhtLocal, prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
 
 	}
     else if (token.stav == s_strednik)
@@ -430,10 +440,10 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
                         zasobnikPush(zasobnik1, neterminal);
 
                         /** Vlozeni do TS */
-                        htInsert(neterminal.polozkaTS.key, neterminal.polozkaTS.data, neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
+                        htInsert(ptrhtLocal, neterminal.polozkaTS.key, neterminal.polozkaTS.data, neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
 
                         /** Vlozeni instrukce do seznamu */
-                        generateInstruction(operace, htSearch(prectiTerminal.polozkaTS.key), htSearch(prectiTerminal3.polozkaTS.key), htSearch(neterminal.polozkaTS.key));
+                        generateInstruction(operace, htSearch(ptrhtLocal, prectiTerminal.polozkaTS.key), htSearch(ptrhtLocal, prectiTerminal3.polozkaTS.key), htSearch(ptrhtLocal, neterminal.polozkaTS.key));
                         return S_BEZ_CHYB;
                     }
 
@@ -448,10 +458,10 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
                         zasobnikPush(zasobnik1, neterminal);
 
                         /** Vlozeni do TS */
-                        htInsert(neterminal.polozkaTS.key, neterminal.polozkaTS.data, neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
+                        htInsert(ptrhtLocal, neterminal.polozkaTS.key, neterminal.polozkaTS.data, neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
 
                         /** Vlozeni instrukce do seznamu */
-                        generateInstruction(operace, htSearch(prectiTerminal.polozkaTS.key), htSearch(prectiTerminal3.polozkaTS.key), htSearch(neterminal.polozkaTS.key));
+                        generateInstruction(operace, htSearch(ptrhtLocal, prectiTerminal.polozkaTS.key), htSearch(ptrhtLocal, prectiTerminal3.polozkaTS.key), htSearch(ptrhtLocal, neterminal.polozkaTS.key));
                         return S_BEZ_CHYB;
                     }
                 }
@@ -470,6 +480,7 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
 }
 
 tChyba precedencniSA() {
+printf("OHFIEIHEFIUH ");
     int precti = 1;
     tChyba navrat;
     tData dolar;
