@@ -503,7 +503,10 @@ tChyba precedencniSA() {
 
         /** Prvni token dostaneme od SA rekurzivniho sestupu */
         if (precti == 1) {
-            prevedToken(token, &prevedenyToken);
+            navrat = prevedToken(token, &prevedenyToken);
+            if (navrat != S_BEZ_CHYB) {
+                return navrat;
+            }
         }
 
         /** Je taky potreba najit nejvrchnejsi terminalni symbol na zasobniku: b */

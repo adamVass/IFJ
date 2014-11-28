@@ -249,6 +249,43 @@ tChyba interpret() {
                     return S_SEMANTICKA_CHYBA_TYPOVA;
                 }
                 break;
+
+            case OC_VETSI_ROVNO:
+                if (tmp1->type == TYPEINT && tmp2->type == TYPEINT) {
+                    tmp3->type = TYPEBOOL;
+                    if (tmp1->data.intNumber >= tmp2->data.intNumber) {
+                        tmp3->data.boolValue = true;
+                    }
+                    else {
+                        tmp3->data.boolValue = false;
+                    }
+                }
+                else if (tmp1->type == TYPEBOOL && tmp2->type == TYPEBOOL) {
+                    tmp3->type = TYPEBOOL;
+                    if (tmp1->data.boolValue >= tmp2->data.boolValue) {
+                        tmp3->data.boolValue = true;
+                    }
+                    else {
+                        tmp3->data.boolValue = false;
+                    }
+                }
+                else if (tmp1->type == TYPEDOUBLE && tmp2->type == TYPEDOUBLE) {
+                    tmp3->type = TYPEBOOL;
+                    if (tmp1->data.floatNumber >= tmp2->data.floatNumber) {
+                        tmp3->data.boolValue = true;
+                    }
+                    else {
+                        tmp3->data.boolValue = false;
+                    }
+                }
+                // pridat porovnani retezcu
+                else {
+                    /** Operandy nejsou stejneho typu, tudiz dojde k semanticke chybe c. 4 */
+                    tmp3->type = TYPEBOOL;
+                    tmp3->data.boolValue = false;
+                    return S_SEMANTICKA_CHYBA_TYPOVA;
+                }
+                break;
         }
 
         /** Posun na dalsi instrukci */
