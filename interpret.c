@@ -9,13 +9,16 @@
 
 
 tChyba interpret() {
-    while (listIntrukci.First != NULL) {
 
-        TItem *tmp1 = (TItem*)listIntrukci.First->instruction.address1;
-        TItem *tmp2 = (TItem*)listIntrukci.First->instruction.address2;
-        TItem *tmp3 = (TItem*)listIntrukci.First->instruction.address3;
+    listIntrukci.Active = listIntrukci.First;
 
-        switch(listIntrukci.First->instruction.instructionType) {
+    while (listIntrukci.Active != NULL) {
+
+        TItem *tmp1 = (TItem*)listIntrukci.Active->instruction.address1;
+        TItem *tmp2 = (TItem*)listIntrukci.Active->instruction.address2;
+        TItem *tmp3 = (TItem*)listIntrukci.Active->instruction.address3;
+
+        switch(listIntrukci.Active->instruction.instructionType) {
 
             /** Aritmeticke instrukce */
                 /** Instrukce scitani */
@@ -342,7 +345,7 @@ tChyba interpret() {
         }
 
         /** Posun na dalsi instrukci */
-        listIntrukci.First = listIntrukci.First->nextItem;
+        listIntrukci.Active = listIntrukci.Active->nextItem;
     }
 
     return S_BEZ_CHYB;

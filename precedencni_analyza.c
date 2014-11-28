@@ -176,7 +176,7 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
             symbolu, jestli ne tak semanticka chyba */
         TItem *tmp;
         if ((tmp = searchFrames(token.data)) == NULL) {
-            fprintf(stderr, "Nedeklarovana promenna");
+            fprintf(stderr, "Nedeklarovana promenna\n");
             return S_SEMANTICKA_CHYBA_NEDEF;
         } else {
             prevedenyToken->symbol = ID;
