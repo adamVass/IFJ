@@ -92,7 +92,7 @@ int main (int argc, char *argv[]) {
             printf("Vysledek typu int %d\n", vysledek->data.intNumber);
         }
         else if (vysledek->type == TYPEBOOL) {
-            printf("Vysledek typu boolean %d\n", vysledek->data.boolValue);
+            printf("Vysledek typu boolean %s\n", vysledek->data.boolValue ? "true" : "false");
         }
         else if (vysledek->type == TYPEDOUBLE) {
             printf("Vysledek typu double %lf\n", vysledek->data.floatNumber);

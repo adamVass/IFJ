@@ -56,10 +56,22 @@ tChyba interpret() {
                     tmp3->data.floatNumber = (double) tmp1->data.intNumber / (double) tmp2->data.floatNumber;
                 }
                 break;
+
+            case OC_ROVNO:
+                if (tmp1->type == TYPEINT && tmp2->type == TYPEINT) {
+                    tmp3->type = TYPEBOOL;
+                    if (tmp1->data.intNumber == tmp2->data.intNumber) {
+                        tmp3->data.boolValue = true;
+                    }
+                    else {
+                        tmp3->data.boolValue = false;
+                    }
+                }
         }
 
         /** Posun na dalsi instrukci */
         listIntrukci.First = listIntrukci.First->nextItem;
     }
 
+    return S_BEZ_CHYB;
 }
