@@ -21,8 +21,25 @@ tChyba interpret() {
                 /** Instrukce scitani */
             case OC_ADD:
                 if (tmp1->type == TYPEINT && tmp2->type == TYPEINT) {
+                    tmp3->type = TYPEINT;
                     tmp3->data.intNumber = tmp1->data.intNumber + tmp2->data.intNumber;
                     //printf("Scitani: operand1 %d, operand2 %d\n", tmp1->data.intNumber, tmp2->data.intNumber);
+                }
+                else if (tmp1->type == TYPEINT && tmp2->type == TYPEDOUBLE) {
+                    tmp3->type = TYPEDOUBLE;
+                    tmp3->data.floatNumber = tmp1->data.intNumber + tmp2->data.floatNumber;
+                }
+                else if (tmp1->type == TYPEDOUBLE && tmp2->type == TYPEINT) {
+                    tmp3->type = TYPEDOUBLE;
+                    tmp3->data.floatNumber = tmp1->data.floatNumber + tmp2->data.intNumber;
+                }
+                else if (tmp1->type == TYPEDOUBLE && tmp2->type == TYPEDOUBLE) {
+                    tmp3->type = TYPEDOUBLE;
+                    tmp3->data.floatNumber = tmp1->data.floatNumber + tmp2->data.floatNumber;
+                }
+                else {
+                    /** Jine kombinace operandu nejsou dovoleny */
+                    return S_SEMANTICKA_CHYBA_TYPOVA;
                 }
                 break;
 
@@ -32,6 +49,22 @@ tChyba interpret() {
                     tmp3->data.intNumber = tmp1->data.intNumber - tmp2->data.intNumber;
                     //printf("Odcitani: operand1 %d, operand2 %d\n", tmp1->data.intNumber, tmp2->data.intNumber);
                 }
+                else if (tmp1->type == TYPEINT && tmp2->type == TYPEDOUBLE) {
+                    tmp3->type = TYPEDOUBLE;
+                    tmp3->data.floatNumber = tmp1->data.intNumber - tmp2->data.floatNumber;
+                }
+                else if (tmp1->type == TYPEDOUBLE && tmp2->type == TYPEINT) {
+                    tmp3->type = TYPEDOUBLE;
+                    tmp3->data.floatNumber = tmp1->data.floatNumber - tmp2->data.intNumber;
+                }
+                else if (tmp1->type == TYPEDOUBLE && tmp2->type == TYPEDOUBLE) {
+                    tmp3->type = TYPEDOUBLE;
+                    tmp3->data.floatNumber = tmp1->data.floatNumber - tmp2->data.floatNumber;
+                }
+                else {
+                    /** Jine kombinace operandu nejsou dovoleny */
+                    return S_SEMANTICKA_CHYBA_TYPOVA;
+                }
                 break;
 
                 /** Instrukce nasobeni */
@@ -39,6 +72,22 @@ tChyba interpret() {
                 if (tmp1->type == TYPEINT && tmp2->type == TYPEINT) {
                     tmp3->data.intNumber = tmp1->data.intNumber * tmp2->data.intNumber;
                     //printf("Nasobeni: operand1 %d, operand2 %d\n", tmp1->data.intNumber, tmp2->data.intNumber);
+                }
+                else if (tmp1->type == TYPEINT && tmp2->type == TYPEDOUBLE) {
+                    tmp3->type = TYPEDOUBLE;
+                    tmp3->data.floatNumber = tmp1->data.intNumber * tmp2->data.floatNumber;
+                }
+                else if (tmp1->type == TYPEDOUBLE && tmp2->type == TYPEINT) {
+                    tmp3->type = TYPEDOUBLE;
+                    tmp3->data.floatNumber = tmp1->data.floatNumber * tmp2->data.intNumber;
+                }
+                else if (tmp1->type == TYPEDOUBLE && tmp2->type == TYPEDOUBLE) {
+                    tmp3->type = TYPEDOUBLE;
+                    tmp3->data.floatNumber = tmp1->data.floatNumber * tmp2->data.floatNumber;
+                }
+                else {
+                    /** Jine kombinace operandu nejsou dovoleny */
+                    return S_SEMANTICKA_CHYBA_TYPOVA;
                 }
                 break;
 
@@ -59,6 +108,10 @@ tChyba interpret() {
                 else if (tmp1->type == TYPEINT && tmp2->type == TYPEDOUBLE) {
                     tmp3->type = TYPEDOUBLE;
                     tmp3->data.floatNumber = (double) tmp1->data.intNumber / (double) tmp2->data.floatNumber;
+                }
+                else {
+                    /** Jine kombinace operandu nejsou dovoleny */
+                    return S_SEMANTICKA_CHYBA_TYPOVA;
                 }
                 break;
 
