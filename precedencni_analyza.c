@@ -428,7 +428,7 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
                     zasobnikPop(zasobnik1);     // odstraneni < zarazky
 
                         /** Vygenerovani instrukce pro aritmeticke operatory */
-                    if ((operace == PLUS) || (operace == MINUS) || (operace == KRAT) || (operace == DELENO)) {
+                    if ((operace == OC_ADD) || (operace == OC_SUB) || (operace == OC_MUL) || (operace == OC_DIV)) {
 
                         generateVariable(&newVar);
                         neterminal.polozkaTS.key = allocString(newVar.data);
@@ -445,8 +445,8 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
                     }
 
                         /** Vygenerovani instrukce pro relacni operatory */
-                    if ((operace == MENSI) || (operace == VETSI) || (operace == MENSIROVNO) ||
-                        (operace == VETSIROVNO) || (operace == ROVNO) || (operace == NEROVNO)) {
+                    else if ((operace == OC_MENSI) || (operace == OC_VETSI) || (operace == OC_MENSI_ROVNO) ||
+                        (operace == OC_VETSI_ROVNO) || (operace == OC_ROVNO) || (operace == OC_NEROVNO)) {
 
                         generateVariable(&newVar);
                         neterminal.polozkaTS.key = allocString(newVar.data);
@@ -477,7 +477,6 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
 }
 
 tChyba precedencniSA() {
-printf("OHFIEIHEFIUH ");
     int precti = 1;
     tChyba navrat;
     tData dolar;
