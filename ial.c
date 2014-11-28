@@ -342,9 +342,18 @@ void quickSort(char *str, int left, int right)
 
 int kmp(char *text, char *pattern)
 {
+/** Searches for substring using Knuth-Morris-Pratt algorithm.
+* @param *text String to be searched in
+* @param *pattern Searched pattern within string
+* @return Index (int) to the beginning of substring within *text or 0 if not found. Using Pascal indexing (from 1)
+*/
+	if (pattern == EMPTY_STRING)
+		return 1;	/* Empty string is found at first position for any string (Pascal) */
 	int tSize = strlen(text), pSize = strlen(pattern);
 	int tIndex, pIndex;
-	int *fail = kmpGraph(pattern, pSize);
+	int *fail = kmpGraph(pattern, pSize);	/* Get 'fail' vector */
+	if (fail == NULL)
+		return -1;	/* Should malloc fail, return -1 */
 	pIndex = -1;
 	for (tIndex = 0; tIndex < tSize; tIndex++)
 	{
@@ -354,8 +363,8 @@ int kmp(char *text, char *pattern)
 			pIndex++;
 		if (pIndex == pSize - 1)
 		{
-			free(fail);
-			return tIndex - pIndex + 1;
+			free(fail);	
+			return tIndex - pIndex + 1;		/* +1 because of Pascal indexing */
 		}
 	}
 
@@ -365,6 +374,11 @@ int kmp(char *text, char *pattern)
 
 int *kmpGraph(char *pattern, int pSize)
 {
+/** Creates vector fail, required for kmp function.
+* @param *pattern Searched pattern within string
+* @param pSize Size of pattern array (in bytes, as it's composed of chars)
+* @return Pointer to created vector - fail
+*/
 	int i, k;
 	i = 1, k = -1;
 
@@ -372,10 +386,10 @@ int *kmpGraph(char *pattern, int pSize)
 	if ((fail = ((int *)malloc(sizeof(int) * pSize))) == NULL)
 		return NULL;
 
-	fail[0] = k;
+	fail[0] = k;	/* First element of fail vector is always 0 */
 	
 	while (i < pSize)
-	{
+	{ /* Populate fail vector for <i, pSize - 1> */
 		while (k > -1 && pattern[k + 1] != pattern[i])
 			k = fail[k];
 		if (pattern[i] == pattern[k+1])
@@ -389,6 +403,6 @@ int *kmpGraph(char *pattern, int pSize)
 }
 
 int strLength(char *str)
-{
+{ /* Obligatory */
 	return strlen(str);		/* science */
 }
