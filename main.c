@@ -8,8 +8,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "ilist.h"
-#include "syntakticka_analyza.h"
-
+#include "precedencni_analyza.h"
+#include "interpret.h"
+//#include "syntakticka_analyza.h"
 
 
 void printdata( TItem *tmp ){
@@ -66,78 +67,26 @@ int main (int argc, char *argv[]) {
     }*/
 
     /** Tabulka symbolu */
-    //htInit();
+    htInit(&ptrhtLocal);
 
     /** Seznam instrukci */
     InitList (&listIntrukci);
 
-    /*int navrat;
+    int navrat;
     tokenInit(&token);
     token = getNextToken();
     navrat = precedencniSA();
     if (navrat == S_BEZ_CHYB)
         printf("Syntakticka analyza OK\n");
     else
-        printf("Syntakticka analyza NO\n");*/
+        printf("Syntakticka analyza NO\n");
 
     //printList();
 
-    /*while (listIntrukci.First != NULL) {
-
-        TItem *tmp1 = (TItem*)listIntrukci.First->instruction.address1;
-        TItem *tmp2 = (TItem*)listIntrukci.First->instruction.address2;
-        TItem *tmp3 = (TItem*)listIntrukci.First->instruction.address3;
-
-
-        switch(listIntrukci.First->instruction.instructionType) {
-
-            case OC_ADD:
-                if (tmp1->type == TYPEINT && tmp2->type == TYPEINT) {
-                    tmp3->data.intNumber = tmp1->data.intNumber + tmp2->data.intNumber;
-                    printf("Scitani: operand1 %d, operand2 %d\n", tmp1->data.intNumber, tmp2->data.intNumber);
-                }
-                break;
-
-            case OC_SUB:
-                if (tmp1->type == TYPEINT && tmp2->type == TYPEINT) {
-                    tmp3->data.intNumber = tmp1->data.intNumber - tmp2->data.intNumber;
-                    printf("Odcitani: operand1 %d, operand2 %d\n", tmp1->data.intNumber, tmp2->data.intNumber);
-                }
-                break;
-
-            case OC_MUL:
-                if (tmp1->type == TYPEINT && tmp2->type == TYPEINT) {
-                    tmp3->data.intNumber = tmp1->data.intNumber * tmp2->data.intNumber;
-                    printf("Nasobeni: operand1 %d, operand2 %d\n", tmp1->data.intNumber, tmp2->data.intNumber);
-                }
-                break;
-
-            case OC_DIV:
-                if (tmp1->type == TYPEINT && tmp2->type == TYPEINT) {
-                    tmp3->type = TYPEDOUBLE;
-                    tmp3->data.floatNumber = (double) tmp1->data.intNumber / (double) tmp2->data.intNumber;
-                }
-                else if (tmp1->type == TYPEDOUBLE && tmp2->type == TYPEDOUBLE) {
-                    tmp3->type = TYPEDOUBLE;
-                    tmp3->data.floatNumber = (double) tmp1->data.floatNumber / (double) tmp2->data.floatNumber;
-                }
-                else if (tmp1->type == TYPEDOUBLE && tmp2->type == TYPEINT) {
-                    tmp3->type = TYPEDOUBLE;
-                    tmp3->data.floatNumber = (double) tmp1->data.floatNumber / (double) tmp2->data.intNumber;
-                }
-                else if (tmp1->type == TYPEINT && tmp2->type == TYPEDOUBLE) {
-                    tmp3->type = TYPEDOUBLE;
-                    tmp3->data.floatNumber = (double) tmp1->data.intNumber / (double) tmp2->data.floatNumber;
-                }
-                break;
-        }*/
-
-        /** Posun na dalsi instrukci */
-        /*listIntrukci.First = listIntrukci.First->nextItem;
-    }*/
+    interpret();
 
         /** Takto se pristupuje k vysledku vyrazu */
-        /*TItem *vysledek = htSearch(neterminal.polozkaTS.key);
+        TItem *vysledek = htSearch(ptrhtLocal, neterminal.polozkaTS.key);
 
         if (vysledek->type == TYPEINT) {
             printf("Vysledek typu int %d\n", vysledek->data.intNumber);
@@ -147,16 +96,17 @@ int main (int argc, char *argv[]) {
         }
         else if (vysledek->type == TYPEDOUBLE) {
             printf("Vysledek typu double %lf\n", vysledek->data.floatNumber);
-        }*/
+        }
 
-    //htPrintTable();
 
-    int navrat;
+
+
+    /*int navrat;
     navrat = syntakticka_anal();
     if(navrat == S_BEZ_CHYB)
         printf("SYN OK\n");
     else
-        printf("SYN NO\n");
+        printf("SYN NO\n");*/
 
 
     return 0;
