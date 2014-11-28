@@ -13,15 +13,6 @@
 
 #include "ilist.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-
-void ErrReport()
-{ /** General error reporting function */
-	printf("Illegal operation within instruction list\n");
-	return;
-}
-
 void InitList (tList *L)
 { 
 /** Initializes list
@@ -45,38 +36,36 @@ void DisposeList (tList *L)
 	L->Last = NULL;
 }
 
-void InsertFirst (tList *L, tInst instr)
+tChyba InsertFirst (tList *L, tInst instr)
 {
 /** Inserts new item to the beginning of list.
 * @param *L Linked list
 * @param instr Instruction
+* @return Error code (specified in #include navratova_hodnota.h)
 */
 	tItemPtr newFirst = NULL;
-	if ((newFirst = malloc(sizeof(struct tItem))) == NULL) /* Ak alokácia zlyhá volá ErrReport() a končí */
-	{
-		ErrReport();
-		return;
-	}
+	if ((newFirst = malloc(sizeof(struct tItem))) == NULL) /* Return S_INTERNI_CHYBA (errno 99) on malloc failure */
+		return S_INTERNI_CHYBA;
 
 	newFirst->instruction = instr;
 	newFirst->nextItem = L->First; 		/* New first item of the list will be pointing to original first item */
 	if (L->First == NULL)
 		L->Last = newFirst; 			/* If the list is empty, new first element will be last as well */
 	L->First = newFirst; 				/* Newly added item will be set as first */
+
+	return S_BEZ_CHYB;
 }
 
-void InsertLast(tList *L, tInst instr)
+tChyba InsertLast(tList *L, tInst instr)
 {
 /** Inserts new item to the end of list.
 * @param *L Linked list
 * @param instr Instruction
+* @return Error code
 */
 	tItemPtr newLast = NULL;
 	if ((newLast = malloc(sizeof(struct tItem))) == NULL)
-	{
-		ErrReport();
-		return;
-	}
+		return S_INTERNI_CHYBA;
 
 	newLast->instruction = instr;
 	newLast->nextItem = NULL;
@@ -87,6 +76,8 @@ void InsertLast(tList *L, tInst instr)
 		L->Last->nextItem = newLast;
 
 	L->Last = newLast;
+
+	return S_BEZ_CHYB;
 }
 
 void DeleteFirst (tList *L)
@@ -118,20 +109,18 @@ void PostDelete (tList *L)
 	}
 }
 
-void PostInsert (tList *L, tInst instr)
+tChyba PostInsert (tList *L, tInst instr)
 {
 /** Inserts new item following active one
 * @param *L Linked list
 * @param instr Instruction
+* @return Error code
 */
 	if (L->Active != NULL)
 	{
 		tItemPtr insert = NULL;
-		if ((insert = malloc(sizeof(struct tItem))) == NULL) /* Should allocation error occur, call ErrReport() func and quit */
-		{
-			ErrReport();
-			return;
-		}
+		if ((insert = malloc(sizeof(struct tItem))) == NULL) /* Return S_INTERNI_CHYBA (errno 99) on malloc failure */
+			return S_INTERNI_CHYBA;
 
 	insert->instruction = instr;
 	insert->nextItem = L->Active->nextItem; 	/* New item of the list will be pointing to the item beyond active one */
@@ -139,6 +128,8 @@ void PostInsert (tList *L, tInst instr)
 	if (L->Active == L->Last)
 		L->Last = insert;
 	}
+
+	return S_BEZ_CHYB;
 }
 
 void Succ (tList *L)
@@ -183,6 +174,6 @@ tInst *GetData(tList *L)
   if (L->Active != NULL)
     return &(L->Active->instruction);
 
-  printf("Zoznam nema aktivnu instrukciu.\n");
+  fprintf(stderr, "Zoznam nema aktivnu instrukciu.\n");
   return NULL;
 }

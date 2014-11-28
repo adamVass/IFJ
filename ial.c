@@ -284,7 +284,7 @@ char *strCopy(char *str, unsigned int s, unsigned int n)
 
 	if ((result = (char*)malloc(n * sizeof(char))) == NULL)
 	{
-		printf("strCopy memory allocation error\n");
+		fprintf(stderr, "strCopy memory allocation error\n");
 		return NULL;
 	}
 
@@ -347,7 +347,7 @@ int kmp(char *text, char *pattern)
 * @param *pattern Searched pattern within string
 * @return Index (int) to the beginning of substring within *text or 0 if not found. Using Pascal indexing (from 1)
 */
-	if (pattern == EMPTY_STRING)
+	if (strcmp(pattern, EMPTY_STRING) == 0)
 		return 1;	/* Empty string is found at first position for any string (Pascal) */
 	int tSize = strlen(text), pSize = strlen(pattern);
 	int tIndex, pIndex;
