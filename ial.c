@@ -339,3 +339,56 @@ void quickSort(char *str, int left, int right)
 	if (j > left)
 		quickSort(str, left, j);	/* Recursion to the left */
 }
+
+int kmp(char *text, char *pattern)
+{
+	int tSize = strlen(text), pSize = strlen(pattern);
+	int tIndex, pIndex;
+	int *fail = kmpGraph(pattern, pSize);
+	pIndex = -1;
+	for (tIndex = 0; tIndex < tSize; tIndex++)
+	{
+		while (pIndex > -1 && pattern[pIndex + 1] != text[tIndex])
+			pIndex = fail[pIndex];
+		if (text[tIndex] == pattern[pIndex + 1])
+			pIndex++;
+		if (pIndex == pSize - 1)
+		{
+			free(fail);
+			return tIndex - pIndex + 1;
+		}
+	}
+
+	free(fail);
+	return 0;
+}
+
+int *kmpGraph(char *pattern, int pSize)
+{
+	int i, k;
+	i = 1, k = -1;
+
+	int *fail;
+	if ((fail = ((int *)malloc(sizeof(int) * pSize))) == NULL)
+		return NULL;
+
+	fail[0] = k;
+	
+	while (i < pSize)
+	{
+		while (k > -1 && pattern[k + 1] != pattern[i])
+			k = fail[k];
+		if (pattern[i] == pattern[k+1])
+			k++;
+		
+		fail[i] = k;
+		i++;
+	}
+
+	return fail;
+}
+
+int strLength(char *str)
+{
+	return strlen(str);		/* science */
+}

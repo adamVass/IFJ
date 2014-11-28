@@ -95,4 +95,10 @@ char *strSort(char *str);
 
 void quickSort(char *str, int left, int right);
 
+int strLength(char *str);
+
+int *kmpGraph(char *pattern, int pSize);
+
+int kmp(char *text, char *pattern);
+
 #endif
