@@ -15,39 +15,41 @@
 TItem* UNDEFPTR;
 
 void htPrintTable() {
-int maxlen = 0;
-int sumcnt = 0;
-printf ("------------HASH TABLE--------------\n");
-for ( int i=0; i<HTSIZE; i++ ) {
-printf ("%i:",i);
-int cnt = 0;
-TItem* ptr = (*ptrht)[i];
-while ( ptr != NULL ) {
-printf (" (%s)",ptr->key); // vytiskne klic
-if( ptr->type == 0 ){ // string
-printf(" %s", ptr->data.str);
-}
-else if( ptr->type == 1 ){ // bool
-printf(" %d", ptr->data.boolValue);
-}
-else if( ptr->type == 2 ){ // int
-printf(" %d", ptr->data.intNumber);
-}
-else if( ptr->type == 3 ){ // double
-printf(" %f", ptr->data.floatNumber);
-}
-if ( ptr != UNDEFPTR )
-cnt++;
-ptr = ptr->ptrnext;
-}
-printf ("\n");
-if (cnt > maxlen)
-maxlen = cnt;
-sumcnt+=cnt;
-}
-printf ("------------------------------------\n");
-printf ("Items count %i The longest list %i\n",sumcnt,maxlen);
-printf ("------------------------------------\n");
+    int maxlen = 0;
+    int sumcnt = 0;
+    printf ("------------HASH TABLE--------------\n");
+
+    for ( int i=0; i<HTSIZE; i++ ) {
+        printf ("%i:",i);
+        int cnt = 0;
+        TItem* ptr = (*ptrht)[i];
+
+        while ( ptr != NULL ) {
+            printf (" (%s)",ptr->key); // vytiskne klic
+            if( ptr->type == 0 ){ // string
+                printf(" %s", ptr->data.str);
+            }
+            else if( ptr->type == 1 ){ // bool
+                printf(" %d", ptr->data.boolValue);
+            }
+            else if( ptr->type == 2 ){ // int
+                printf(" %d", ptr->data.intNumber);
+            }
+            else if( ptr->type == 3 ){ // double
+                printf(" %f", ptr->data.floatNumber);
+            }
+            if ( ptr != UNDEFPTR )
+                cnt++;
+            ptr = ptr->ptrnext;
+        }
+        printf ("\n");
+        if (cnt > maxlen)
+            maxlen = cnt;
+        sumcnt+=cnt;
+    }
+    printf ("------------------------------------\n");
+    printf ("Items count %i The longest list %i\n",sumcnt,maxlen);
+    printf ("------------------------------------\n");
 }
 
 #define VELIKOST_TABULKY 14
@@ -265,7 +267,7 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
     return S_BEZ_CHYB;
 }
 
-int zjistiOperator (int operace) {
+TOpCode zjistiOperator (int operace) {
     if (operace == PLUS) {
         return OC_ADD;
     }

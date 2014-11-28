@@ -72,18 +72,18 @@ int main (int argc, char *argv[]) {
     /** Seznam instrukci */
     InitList (&listIntrukci);
 
-    int navrat;
+    /*int navrat;
     tokenInit(&token);
     token = getNextToken();
     navrat = precedencniSA();
     if (navrat == S_BEZ_CHYB)
         printf("Syntakticka analyza OK\n");
     else
-        printf("Syntakticka analyza NO\n");
+        printf("Syntakticka analyza NO\n");*/
 
     //printList();
 
-    while (listIntrukci.First != NULL) {
+    /*while (listIntrukci.First != NULL) {
 
         TItem *tmp1 = (TItem*)listIntrukci.First->instruction.address1;
         TItem *tmp2 = (TItem*)listIntrukci.First->instruction.address2;
@@ -131,14 +131,14 @@ int main (int argc, char *argv[]) {
                     tmp3->data.floatNumber = (double) tmp1->data.intNumber / (double) tmp2->data.floatNumber;
                 }
                 break;
-        }
+        }*/
 
         /** Posun na dalsi instrukci */
-        listIntrukci.First = listIntrukci.First->nextItem;
-    }
+        /*listIntrukci.First = listIntrukci.First->nextItem;
+    }*/
 
         /** Takto se pristupuje k vysledku vyrazu */
-        TItem *vysledek = htSearch(neterminal.polozkaTS.key);
+        /*TItem *vysledek = htSearch(neterminal.polozkaTS.key);
 
         if (vysledek->type == TYPEINT) {
             printf("Vysledek typu int %d\n", vysledek->data.intNumber);
@@ -148,16 +148,16 @@ int main (int argc, char *argv[]) {
         }
         else if (vysledek->type == TYPEDOUBLE) {
             printf("Vysledek typu double %lf\n", vysledek->data.floatNumber);
-        }
+        }*/
 
     //htPrintTable();
 
-    /*int navrat;
+    int navrat;
     navrat = syntakticka_anal();
     if(navrat == S_BEZ_CHYB)
         printf("SYN OK\n");
     else
-        printf("SYN NO\n");*/
+        printf("SYN NO\n");
 
 
     return 0;
