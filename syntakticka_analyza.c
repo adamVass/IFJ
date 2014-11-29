@@ -12,14 +12,17 @@
 #include <string.h>
 #include <stdbool.h>
 #include "syntakticka_analyza.h"
-
+#include "ilist.h"
 
 //deklarace funkci, ktere budou zmineny driv, nez budou implementovany
 int dtype;
 TData dat;
 bool init;
 bool prirovnani;
+int pocitadlo;
+int pocitani_parametru=0;
 
+char* porovnani;
 char* id;
 char* funkce;
 char* params;
@@ -41,6 +44,7 @@ tChyba CYKLUS();
 tChyba TERM();
 tChyba UKONCOVACI();
 tChyba DOPREDNE();
+tChyba TERM2();
 
 void htPrintTable( tHTable *ptrht ) {
 	int maxlen = 0;
@@ -87,6 +91,7 @@ printf ("------------------------------------\n");
 
 
 
+
 tChyba PROGRAM () {					//funkce na pravidlo PROGRAM -> FUNKCE . eof
 							//nacitani prvniho tokenu je v komentu, protoze na konci je pomocna funkce, kde se uz nacita token, pri vyslednem kodu, bude toto nacteni tokenu odkomentovano
 	/*token = getNextToken();
@@ -123,7 +128,8 @@ tChyba PROGRAM () {					//funkce na pravidlo PROGRAM -> FUNKCE . eof
 }
 
 tChyba FUNKCE() {
-	int analyza;					//opet lokalni promenna, stejna funkce jako ve funkci nahore
+	int analyza;
+						//opet lokalni promenna, stejna funkce jako ve funkci nahore
 	TItem *nasel;
 	if(!strcmp(token.data, "begin") && token.stav == s_klicove) {
 		token = getNextToken();			//pres strcmp porovnavam data tokenu (prakticky primo to, co se nacte)
@@ -216,7 +222,7 @@ tChyba FUNKCE() {
 							return analyza;
 						}
 
-						
+												
 						if(init == true) {
 							htCompleteInsert(ptrhtGlobal,funkce, ID_FUNCTION, dtype, true);
 							free(funkce);
@@ -229,12 +235,7 @@ tChyba FUNKCE() {
 						}
 
 						if(token.stav == s_strednik) {
-							htPrintTable( ptrhtLocal );
-							if(init == false) {
-							popFrame();
-							}
-							init = false;
-
+							
 							token = getNextToken();
 							if(token.stav == s_lex_error) {
 								return S_LEXIKALNI_CHYBA;
@@ -395,7 +396,7 @@ tChyba PROM() {
 				return S_LEXIKALNI_CHYBA;
 			}
 
-			analyza = TERM();
+			analyza = TERM2();
 			if(analyza != S_BEZ_CHYB) {
 				return analyza;
 			}
@@ -570,6 +571,7 @@ tChyba VESTAV() {
 
 tChyba DOPREDNE() {
 	int ret;
+	TItem *nasel;
 	if(!strcmp(token.data, "forward") && token.stav == s_klicove) {			
 		init = true;
 		token = getNextToken();
@@ -583,6 +585,13 @@ tChyba DOPREDNE() {
 		if(ret != S_BEZ_CHYB) {
 			return ret;
 		}
+
+		nasel = htSearch(ptrhtGlobal, funkce);
+		if(nasel != NULL) {
+			for(int i=0; i < nasel->data.param.numParam; i++) {
+				htDeclInsert(ptrhtLocal, nasel->data.param.param[i], nasel->data.param.typeParam[i], ID_PARAM);	
+			}
+		}	
 
 	return ACT_LIST();
 }
@@ -654,14 +663,20 @@ tChyba ROZHODNI() {
 		}
 			
 		if(token.stav == s_identifikator) {
-					
+			if((porovnani = malloc(strlen(token.data)+1)) == NULL) {
+				return S_INTERNI_CHYBA;
+			}
+
+			strcpy(porovnani, token.data);
 			pt = searchFrames(token.data);
 			
-			if(pt != NULL) {
+			if(pt != NULL && pt->druh == ID_FUNCTION) {
 				analyza1 = PROM();
 				if(analyza1 != S_BEZ_CHYB) {
 					return analyza1;
 				}
+				
+				free(porovnani);
 				return S_BEZ_CHYB;	
 			}
 			else 		
@@ -896,7 +911,7 @@ tChyba ACT_LIST() {
 				if(analyza != S_BEZ_CHYB) {
 					return analyza;
 				}
-				return ACT_LIST();
+				return UKONCOVACI();
 			}
 			
 		}
@@ -923,7 +938,7 @@ tChyba ACT_LIST() {
 			if(analyza != S_BEZ_CHYB) {
 				return analyza;
 			}
-			return ACT_LIST();
+			return UKONCOVACI();
 		}
 		return S_SYNTAKTICKA_CHYBA;
 	}
@@ -1071,6 +1086,11 @@ tChyba TERM() {
 		if(analyza != S_BEZ_CHYB) {
 			return analyza;
 		}
+
+		token = getNextToken();
+		if(token.stav == s_lex_error) {
+			return S_LEXIKALNI_CHYBA;
+		}
 		return TERM();
 	}
 	else if(token.stav == s_carka) {
@@ -1097,6 +1117,70 @@ tChyba TERM() {
 	return S_SYNTAKTICKA_CHYBA;
 }
 
+tChyba TERM2() {
+	int analyza;
+	
+	TItem *pt;
+	if(token.stav == s_cele_cislo || token.stav == s_desetinne_cislo || token.stav == s_logicka_hodnota || token.stav == s_string || token.stav == s_identifikator) {
+		analyza = DRUH();
+		if(analyza != S_BEZ_CHYB) {
+			return analyza;
+		}
+
+		pt = htSearch(ptrhtGlobal, porovnani);
+		if(token.stav != pt->data.param.typeParam[pocitadlo]) {
+			return S_SEMANTICKA_CHYBA_TYPOVA;
+		}
+
+		token = getNextToken();
+		if(token.stav == s_lex_error) {
+			return S_LEXIKALNI_CHYBA;
+		}
+		pocitadlo++;
+		return TERM2();
+	}
+	else if(token.stav == s_carka) {
+		token = getNextToken();
+		if(token.stav == s_lex_error) {
+			return S_LEXIKALNI_CHYBA;
+		}
+
+		if(token.stav == s_cele_cislo || token.stav == s_desetinne_cislo || token.stav == s_logicka_hodnota || token.stav == s_string || token.stav == s_identifikator) {
+			analyza = DRUH();
+			if(analyza != S_BEZ_CHYB) {
+				return analyza;
+			}
+			
+			pt = htSearch(ptrhtGlobal, porovnani);
+			if(token.stav != pt->data.param.typeParam[pocitadlo]) {
+				return S_SEMANTICKA_CHYBA_TYPOVA;
+			}
+
+			token = getNextToken();
+			if(token.stav == s_lex_error) {
+				return S_LEXIKALNI_CHYBA;
+			}
+
+			pocitadlo++;
+			return TERM2();
+		}
+	}
+	else if(token.stav == s_prava_zavorka) {
+		pt = htSearch(ptrhtGlobal, porovnani);
+		if(pocitadlo != pt->data.param.numParam) {
+			return S_SEMANTICKA_CHYBA_TYPOVA;
+		}
+		
+		pocitadlo = 0;
+		token = getNextToken();
+		if(token.stav == s_lex_error) {
+			return S_LEXIKALNI_CHYBA;
+		}
+		return S_BEZ_CHYB;
+	}
+	return S_SYNTAKTICKA_CHYBA;
+}
+
 tChyba DRUH() {
 	int analyza;	
 	if(token.stav == s_cele_cislo || token.stav == s_desetinne_cislo || token.stav == s_logicka_hodnota || token.stav == s_string) {
@@ -1104,10 +1188,6 @@ tChyba DRUH() {
 		if(analyza != S_BEZ_CHYB) {
 			return analyza;
 		}
-		token = getNextToken();
-		if(token.stav == s_lex_error) {
-			return S_LEXIKALNI_CHYBA;
-		}	
 		return S_BEZ_CHYB;
 	}
 	else if(token.stav == s_identifikator) {
