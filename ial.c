@@ -157,7 +157,7 @@ tChyba htInsert ( tHTable *ptrht, char *key, TData data, int type, int druh ) {
 	new->key = malloc(strlen(key)+1);
 	strcpy(new->key, key);
 	
-	if( type == 0 ){
+	if( type == TYPESTR ){
 		
 		new->data.str = malloc( strlen(data.str)+1 );
 		if( !new->data.str ){
