@@ -9,18 +9,18 @@
 
 #define MAX_HTSIZE 61
 
-#define TYPESTR      0
-#define TYPEBOOL     1
-#define TYPEINT      2
-#define TYPEDOUBLE   3
+#define TYPESTR      15
+#define TYPEBOOL     4
+#define TYPEINT      5
+#define TYPEDOUBLE   6
 #define TYPEFUNC     4
 
-#define ID_FUNCTION  5
-#define ID_LOCAL     6
-#define ID_GLOBAL    7
-#define ID_PARAM     8
+#define ID_FUNCTION  7
+#define ID_LOCAL     8
+#define ID_GLOBAL    9
+#define ID_PARAM     10
 
-#define TYPEUNDEF    10
+#define TYPEUNDEF    11
 
 #define EMPTY_STRING ""
 
