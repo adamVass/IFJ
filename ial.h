@@ -13,7 +13,7 @@
 #define TYPEBOOL     4
 #define TYPEINT      5
 #define TYPEDOUBLE   6
-#define TYPEFUNC     4
+#define TYPEFUNC     3
 
 #define ID_FUNCTION  7
 #define ID_LOCAL     8
