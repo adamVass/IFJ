@@ -21,7 +21,9 @@ bool init;
 bool prirovnani;
 int pocitadlo;
 int pocitani_parametru=0;
+bool bylo_id;
 
+char* term_id;
 char* porovnani;
 char* id;
 char* funkce;
@@ -151,10 +153,14 @@ tChyba FUNKCE() {
 		}
 
 		if(token.stav == s_identifikator) {	//pokud nacitame a porovnavame terminaly, tak po kazdem porovnani nacitame dalsi token, aby se neporovnavalo to same
-			
+			if(!strcmp(token.data, "length") || !strcmp(token.data, "copy")) {
+				return S_SEMANTICKA_CHYBA_NEDEF;
+			}
+
 			if((funkce = malloc(strlen(token.data)+1)) == NULL) {
 				return S_INTERNI_CHYBA;
 			}
+			
 			
 			dat.param.numParam = 0;
 			strcpy(funkce, token.data);
@@ -408,6 +414,7 @@ tChyba PROM() {
 }
 
 tChyba VESTAV() {
+	TItem *pt;
 	if(!strcmp(token.data, "length") && token.stav == s_klicove) {
 		token = getNextToken();
 		if(token.stav == s_lex_error) {
@@ -419,8 +426,19 @@ tChyba VESTAV() {
 			if(token.stav == s_lex_error) {
 				return S_LEXIKALNI_CHYBA;
 			}
+			else if(token.stav == s_string || token.stav == s_identifikator) {
+				if(token.stav == s_identifikator) {
+					pt = searchFrames(token.data);	
+					if(pt != NULL) {
+						if(pt->type != s_string) {
+							return S_SEMANTICKA_CHYBA_TYPOVA;
+						}
+					}
+					else
+						return S_SEMANTICKA_CHYBA_NEDEF;
+				}
+				
 
-			else if(token.stav == s_string) {
 				token = getNextToken();
 				if(token.stav == s_lex_error) {
 					return S_LEXIKALNI_CHYBA;
@@ -449,7 +467,18 @@ tChyba VESTAV() {
 				return S_LEXIKALNI_CHYBA;
 			}
 
-			else if(token.stav == s_string) {
+			else if(token.stav == s_string || token.stav == s_identifikator) {
+				if(token.stav == s_identifikator) {
+					pt = searchFrames(token.data);	
+					if(pt != NULL) {
+						if(pt->type != s_string) {
+							return S_SEMANTICKA_CHYBA_TYPOVA;
+						}
+					}
+					else
+						return S_SEMANTICKA_CHYBA_NEDEF;
+				}
+
 				token = getNextToken();
 				if(token.stav == s_lex_error) {
 					return S_LEXIKALNI_CHYBA;
@@ -461,7 +490,18 @@ tChyba VESTAV() {
 						return S_LEXIKALNI_CHYBA;
 					}
 
-					else if(token.stav == s_string) {
+					else if(token.stav == s_cele_cislo || token.stav == s_identifikator) {
+						if(token.stav == s_identifikator) {
+							pt = searchFrames(token.data);	
+							if(pt != NULL) {
+								if(pt->type != s_string) {
+									return S_SEMANTICKA_CHYBA_TYPOVA;
+								}
+							}
+							else
+								return S_SEMANTICKA_CHYBA_NEDEF;
+						}
+
 						token = getNextToken();
 						if(token.stav == s_lex_error) {
 							return S_LEXIKALNI_CHYBA;
@@ -473,7 +513,18 @@ tChyba VESTAV() {
 								return S_LEXIKALNI_CHYBA;
 							}
 
-							else if(token.stav == s_string) {
+							else if(token.stav == s_cele_cislo || token.stav == s_identifikator) {
+								if(token.stav == s_identifikator) {
+									pt = searchFrames(token.data);	
+									if(pt != NULL) {
+										if(pt->type != s_string) {
+											return S_SEMANTICKA_CHYBA_TYPOVA;
+										}
+									}
+									else
+										return S_SEMANTICKA_CHYBA_NEDEF;
+								}
+
 								token = getNextToken();
 								if(token.stav == s_lex_error) {
 									return S_LEXIKALNI_CHYBA;
@@ -506,7 +557,18 @@ tChyba VESTAV() {
 				return S_LEXIKALNI_CHYBA;
 			}
 
-			else if(token.stav == s_string) {
+			else if(token.stav == s_string || s_identifikator) {
+				if(token.stav == s_identifikator) {
+					pt = searchFrames(token.data);	
+					if(pt != NULL) {
+						if(pt->type != s_string) {
+							return S_SEMANTICKA_CHYBA_TYPOVA;
+						}
+					}
+					else
+						return S_SEMANTICKA_CHYBA_NEDEF;
+				}
+
 				token = getNextToken();
 				if(token.stav == s_lex_error) {
 					return S_LEXIKALNI_CHYBA;
@@ -518,7 +580,18 @@ tChyba VESTAV() {
 						return S_LEXIKALNI_CHYBA;
 					}
 
-					else if(token.stav == s_string) {
+					else if(token.stav == s_string || token.stav == s_identifikator) {
+						if(token.stav == s_identifikator) {
+							pt = searchFrames(token.data);	
+							if(pt != NULL) {
+								if(pt->type != s_string) {
+									return S_SEMANTICKA_CHYBA_TYPOVA;
+								}
+							}
+							else
+								return S_SEMANTICKA_CHYBA_NEDEF;
+						}
+
 						token = getNextToken();
 						if(token.stav == s_lex_error) {
 							return S_LEXIKALNI_CHYBA;
@@ -549,7 +622,18 @@ tChyba VESTAV() {
 				return S_LEXIKALNI_CHYBA;
 			}
 
-			else if(token.stav == s_string) {
+			else if(token.stav == s_string || token.stav == s_identifikator) {
+				if(token.stav == s_identifikator) {
+					pt = searchFrames(token.data);	
+					if(pt != NULL) {
+						if(pt->type != s_string) {
+							return S_SEMANTICKA_CHYBA_TYPOVA;
+						}
+					}
+					else
+						return S_SEMANTICKA_CHYBA_NEDEF;
+				}
+
 				token = getNextToken();
 				if(token.stav == s_lex_error) {
 					return S_LEXIKALNI_CHYBA;
@@ -655,11 +739,15 @@ tChyba ROZHODNI() {
 		}	
 		return S_BEZ_CHYB;
 	}
-	else 
+	else {
 		
 		analyza2 = VESTAV();
 		if(analyza2 != S_BEZ_CHYB && analyza2 != S_EPS) {
 			return analyza2;
+		}
+
+		if(analyza2 == S_BEZ_CHYB) {
+			return S_BEZ_CHYB;
 		}
 			
 		if(token.stav == s_identifikator) {
@@ -697,7 +785,7 @@ tChyba ROZHODNI() {
 			return S_BEZ_CHYB;
 		}
 		return S_SYNTAKTICKA_CHYBA;
-		
+	}	
 
 }
 
@@ -829,6 +917,15 @@ tChyba ACT_LIST() {
 				return S_INTERNI_CHYBA;
 			}
 			
+			if(!strcmp(token.data, "length") || !strcmp(token.data, "copy")) {
+				return S_SEMANTICKA_CHYBA_NEDEF;
+			}
+
+			pt = searchFrames(token.data);
+			if(pt != NULL) {
+				return S_SEMANTICKA_CHYBA_NEDEF;
+			}
+
 			strcpy(id, token.data);		
 			token = getNextToken();
 			if(token.stav == s_lex_error) {
@@ -955,6 +1052,11 @@ tChyba ACT_LIST() {
 			}
 
 			else if(token.stav == s_identifikator) {
+				pt = searchFrames(token.data);
+				if(pt == NULL) {
+					return S_SEMANTICKA_CHYBA_NEDEF;
+				}
+
 				token = getNextToken();
 				if(token.stav == s_lex_error) {
 					return S_LEXIKALNI_CHYBA;
@@ -973,6 +1075,9 @@ tChyba ACT_LIST() {
 					return S_BEZ_CHYB;
 					
 				}
+			}
+			else {
+				return S_SEMANTICKA_CHYBA_TYPOVA;
 			}
 		}
 		return S_SYNTAKTICKA_CHYBA;
@@ -1018,12 +1123,21 @@ tChyba CYKLUS() {
 
 tChyba DEKLARACE() {
 	int analyza;
-	
+	TItem *pt;
 	if(token.stav == s_identifikator) {
 		if((id = malloc(strlen(token.data)+1)) == NULL) {
 			return S_INTERNI_CHYBA;
 		}
 		
+		if(!strcmp(token.data, "length") || !strcmp(token.data, "copy")) {
+				return S_SEMANTICKA_CHYBA_NEDEF;
+		}
+
+		pt = searchFrames(token.data);
+		if(pt != NULL) {
+			return S_SEMANTICKA_CHYBA_NEDEF;
+		}
+
 		strcpy(id, token.data);		
 		token = getNextToken();
 		if(token.stav == s_lex_error) {
@@ -1104,6 +1218,11 @@ tChyba TERM() {
 			if(analyza != S_BEZ_CHYB) {
 				return analyza;
 			}
+
+			token = getNextToken();
+			if(token.stav == s_lex_error) {
+				return S_LEXIKALNI_CHYBA;
+			}
 			return TERM();
 		}
 	}
@@ -1121,17 +1240,34 @@ tChyba TERM2() {
 	int analyza;
 	
 	TItem *pt;
+	TItem *pt2;
 	if(token.stav == s_cele_cislo || token.stav == s_desetinne_cislo || token.stav == s_logicka_hodnota || token.stav == s_string || token.stav == s_identifikator) {
 		analyza = DRUH();
 		if(analyza != S_BEZ_CHYB) {
 			return analyza;
 		}
-
+		
 		pt = htSearch(ptrhtGlobal, porovnani);
-		if(token.stav != pt->data.param.typeParam[pocitadlo]) {
-			return S_SEMANTICKA_CHYBA_TYPOVA;
+		if(bylo_id == true) {
+			pt2 = searchFrames(token.data);
+			if(pt2 != NULL) {
+				if(pt->data.param.typeParam[pocitadlo] != pt2->type) {
+					return S_SEMANTICKA_CHYBA_TYPOVA;
+				}
+			}
+			else {
+				return S_SEMANTICKA_CHYBA_NEDEF;
+			}
+						
+			bylo_id = false;
 		}
-
+		else {
+			if(token.stav != pt->data.param.typeParam[pocitadlo]) {
+			return S_SEMANTICKA_CHYBA_TYPOVA;
+			}
+		}
+		
+		
 		token = getNextToken();
 		if(token.stav == s_lex_error) {
 			return S_LEXIKALNI_CHYBA;
@@ -1152,8 +1288,23 @@ tChyba TERM2() {
 			}
 			
 			pt = htSearch(ptrhtGlobal, porovnani);
-			if(token.stav != pt->data.param.typeParam[pocitadlo]) {
+			if(bylo_id == true) {
+				pt2 = searchFrames(token.data);
+				if(pt2 != NULL) {
+					if(pt->data.param.typeParam[pocitadlo] != pt2->type) {
+						return S_SEMANTICKA_CHYBA_TYPOVA;
+					}
+				}
+				else {
+					return S_SEMANTICKA_CHYBA_NEDEF;
+				}
+						
+				bylo_id = false;
+			}
+			else {
+				if(token.stav != pt->data.param.typeParam[pocitadlo]) {
 				return S_SEMANTICKA_CHYBA_TYPOVA;
+				}
 			}
 
 			token = getNextToken();
@@ -1191,10 +1342,8 @@ tChyba DRUH() {
 		return S_BEZ_CHYB;
 	}
 	else if(token.stav == s_identifikator) {
-		token = getNextToken();
-		if(token.stav == s_lex_error) {
-			return S_LEXIKALNI_CHYBA;
-		}
+		
+		bylo_id = true;
 		return S_BEZ_CHYB;
 	}	
 	return S_SYNTAKTICKA_CHYBA;		

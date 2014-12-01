@@ -30,5 +30,6 @@ tChyba CYKLUS();
 tChyba TERM();
 tChyba UKONCOVACI();
 tChyba DOPREDNE();
+tChyba TERM2();
 
 #endif
