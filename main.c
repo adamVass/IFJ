@@ -10,7 +10,7 @@
 #include "ilist.h"
 #include "precedencni_analyza.h"
 #include "interpret.h"
-//#include "syntakticka_analyza.h"
+#include "syntakticka_analyza.h"
 
 
 void printdata( TItem *tmp ){
@@ -67,29 +67,31 @@ int main (int argc, char *argv[]) {
     }*/
 
     /** Tabulka symbolu */
-    htInit(&ptrhtLocal);
+    //htInit(&ptrhtLocal);
+	//htInit(&ptrhtGlobal);
 
     /** Seznam instrukci */
     InitList (&listIntrukci);
 
-    int navrat;
+    /*int navrat;
     tokenInit(&token);
     token = getNextToken();
     navrat = precedencniSA();
     if (navrat == S_BEZ_CHYB)
         printf("Syntakticka analyza OK\n");
     else
-        printf("Syntakticka analyza NO\n");
+        printf("Syntakticka analyza NO\n");*/
 
     //printList();
 
-    tChyba navr_kod = interpret();
-    printf("Navratovy kod interpretu: %d\n", navr_kod);
+    /*tChyba navr_kod = interpret();
+    printf("Navratovy kod interpretu: %d\n", navr_kod);*/
 
         /** Takto se pristupuje k vysledku vyrazu */
-        TItem *vysledek = htSearch(ptrhtLocal, neterminal.polozkaTS.key);
+        /*TItem *vysledek = htSearch(ptrhtLocal, neterminal.polozkaTS.key);
 
-        if (vysledek->type == TYPEINT) {
+if (vysledek != NULL) {
+	if (vysledek->type == TYPEINT) {
             printf("Vysledek typu int %d\n", vysledek->data.intNumber);
         }
         else if (vysledek->type == TYPEBOOL) {
@@ -98,17 +100,21 @@ int main (int argc, char *argv[]) {
         else if (vysledek->type == TYPEDOUBLE) {
             printf("Vysledek typu double %lf\n", vysledek->data.floatNumber);
         }
+}*/
+        
 
 
 
 
-    /*int navrat;
+    int navrat;
     navrat = syntakticka_anal();
     if(navrat == S_BEZ_CHYB)
-        printf("SYN OK\n");
+        fprintf(stderr, "SYN OK\n");
     else
-        printf("SYN NO\n");*/
+        fprintf(stderr, "SYN NO\n");
+
+	fprintf(stderr, "Navratova hodnota parseru: %d\n", navrat);
 
 
-    return 0;
+    return navrat;
 }
