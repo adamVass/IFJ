@@ -243,7 +243,6 @@ tToken getNextToken() {
             }
             else {
                 stav = s_lex_error;
-                tokenChangeState(&token, stav);
             }
             break;
 
@@ -275,7 +274,6 @@ tToken getNextToken() {
             }
             else {
                 stav = s_lex_error;
-                tokenChangeState(&token, stav);
             }
             break;
 
@@ -293,7 +291,6 @@ tToken getNextToken() {
             }
             else {                              /** Jinak chyba */
                 stav = s_lex_error;
-                tokenChangeState(&token, stav);
                 ungetc(c, f);
             }
             break;
@@ -309,7 +306,6 @@ tToken getNextToken() {
             }
             else {                              /** Jinak chyba */
                 stav = s_lex_error;
-                tokenChangeState(&token, stav);
                 ungetc(c, f);
             }
             break;
@@ -398,7 +394,6 @@ tToken getNextToken() {
                     zda neprijde EOF (neukonceny komentar). */
                 if (c == EOF) {
                     stav = s_lex_error;
-                    tokenChangeState(&token, stav);
                 }
             }
             break;
@@ -411,7 +406,6 @@ tToken getNextToken() {
             }
             else if (c < 31) {                      /** Nepovolene znaky */
                 stav = s_lex_error;
-                tokenChangeState(&token, stav);
             }
             else {                                  /** Jinak normalne ukladame znaky do retezce */
                 tokenEdit(&token, c);
@@ -446,7 +440,6 @@ tToken getNextToken() {
                 }
                 else {
                     stav = s_lex_error;
-                    tokenChangeState(&token, stav);
                 }
             }
             else if (isdigit(c)) {
@@ -455,7 +448,6 @@ tToken getNextToken() {
             }
             else {
                 stav = s_lex_error;
-                tokenChangeState(&token, stav);
             }
             break;
 
@@ -467,6 +459,9 @@ tToken getNextToken() {
                 stav = s_string_escape;
                 pom = pom*10+c;
                 pom_escape = pom_escape*10+(c - '0');
+            }
+            else {
+                stav = s_lex_error;
             }
             break;
 
