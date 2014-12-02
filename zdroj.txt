@@ -1,22 +1,49 @@
+
+function prdel (kokot : integer ; curak : integer ; pica : integer) : integer;
+begin
+if kokot > curak then 
+begin
+pica := kokot
+end else
+begin
+curak := kokot+1
+end
+end;
+
+
 var
 a : integer;
 vysl : integer;
+ahoj : string;
+
 begin
+var
+chuj : integer;
+
+ahoj := 'kokote';
 write('Zadejte cislo pro vypocet faktorialu: ');
+a := 8;
+
 readln(a);
 if a < 0 then
 begin
-write('Faktorial nelze spocitat'#10'')
+vysl := 5+5;
+write(vysl);
+ahoj := sort (ahoj);
+a := prdel(vysl, 8, 9)
+
 end
 else
 begin
 vysl := 1;
 while a > 0 do
-9
+
 begin
 vysl := vysl * a;
 a := a - 1
 end;
+
 write('Vysledek je: ', vysl, ''#10'')
 end
+
 end.

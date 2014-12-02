@@ -49,7 +49,17 @@ typedef enum {
     OC_MENSI_ROVNO,
     OC_VETSI_ROVNO,
     OC_ROVNO,
-    OC_NEROVNO
+    OC_NEROVNO,
+    OC_PRIRAZENI,
+    OC_IF_GOTO,
+    OC_WHILE_GOTO,
+    OC_NEG,
+    OC_WRITE,
+    OC_READ,
+    OC_LENGTH,
+    OC_SORT,
+    OC_COPY,
+    OC_FIND
 } TOpCode;
 
 tList listIntrukci;

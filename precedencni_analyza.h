@@ -103,7 +103,4 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2);
 /** Funkce provede analyzu vyrazu */
 tChyba precedencniSA();
 
-/** Funkce vlozi instrukci do seznamu instrukci */
-void generateInstruction(int typInstrukce, void *addr1, void *addr2, void *addr3);
-
 #endif

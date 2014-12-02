@@ -175,7 +175,7 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
         /** kontrola, jestli se identifikator nachazi v tabulce
             symbolu, jestli ne tak semanticka chyba */
         TItem *tmp;
-        if ((tmp = searchFrames(token.data)) == NULL) {
+        if ((tmp = searchFrames(token.data, ptrhtLocal, ptrhtGlobal)) == NULL) {
             fprintf(stderr, "Nedeklarovana promenna\n");
             return S_SEMANTICKA_CHYBA_NEDEF;
         } else {

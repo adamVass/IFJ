@@ -24,7 +24,13 @@
 
 #define EMPTY_STRING ""
 
+
+
+
+
+
 typedef struct TParam{
+    
    int numParam;     //pocet parametru - vynulovat pri vkladani funkce
    char **param;     //parametry
    int *typeParam;   //typy parametru
@@ -52,9 +58,11 @@ typedef union TData{
 /* TRP s explicitně zřetězenými synonymy. */
 typedef TItem* tHTable[MAX_HTSIZE];
 
+
 /* Globalni promenna hash table */
 tHTable *ptrhtGlobal;
 tHTable *ptrhtLocal;
+tHTable *ptrhtLastLocal;
 
 /* Pro účely testování je vhodné mít možnost volby velikosti pole,
    kterým je vyhledávací tabulka implementována. Fyzicky je deklarováno

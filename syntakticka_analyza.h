@@ -12,7 +12,9 @@
 #include "precedencni_analyza.h"
 #include "frame.h"
 
+//hlavicky funkci
 int syntakticka_anal();
+void htPrintTable( tHTable *ptrht );
 tChyba DTYPE2();
 tChyba DRUH();
 tChyba FUNKCE();
