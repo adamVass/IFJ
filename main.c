@@ -89,33 +89,34 @@ int main (int argc, char *argv[]) {
     /*  Je potreba pridat do globalni tabulky polozku promenne,
         do ktere se bude prirazovat napr. vysledek vyrazu */
 
-	//TData *datavysl = malloc(sizeof(TData));
-	//htInsert(ptrhtGlobal, "vysledek", datavysl, TYPEDOUBLE, ID_GLOBAL);
+	TData *datavysl = malloc(sizeof(TData));
+	htInsert(ptrhtGlobal, "vysledek", datavysl, TYPEBOOL, ID_GLOBAL);
     //htPrintTable(ptrhtGlobal);
 
 
     /** Test precedencni analyzy*/
-    int navrat;
+    /*int navrat;
     tokenInit(&token);
     token = getNextToken();
     navrat = precedencniSA();
     if (navrat == S_BEZ_CHYB)
         fprintf(stderr, "Syntakticka analyza OK\n");
     else
-        fprintf(stderr, "Syntakticka analyza NO\n");
+        fprintf(stderr, "Syntakticka analyza NO\n");*/
 
     //generateInstruction(OC_PRIRAZENI, htSearch(ptrhtLocal, neterminal.polozkaTS.key), NULL, htSearch(ptrhtGlobal, "vysledek"));
+    generateInstruction(OC_READ, NULL, NULL, htSearch(ptrhtGlobal, "vysledek"));
 
     tChyba navr_kod = interpret();
     fprintf(stderr, "Navratovy kod interpretu: %d\n", navr_kod);
 
     /** Vytisk seznamu instrukci */
-    printList();
+    //printList();
 
-    /*TItem *tmp = htSearch(ptrhtGlobal, "vysledek");
+    TItem *tmp = htSearch(ptrhtGlobal, "vysledek");
     if (tmp != NULL) {
         printdata(tmp);
-    }*/
+    }
 
 
 // -----------------------------------------------------------------------------------------------------

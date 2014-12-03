@@ -418,6 +418,25 @@ tChyba interpret() {
                 }
 
                 break;
+
+            case OC_READ:
+                if (tmp3->type == TYPEINT) {
+                    if (scanf("%i", &(tmp3->data->intNumber)) != 1) {
+                        fprintf(stderr, "Promenna je jineho typu\n");
+                        return S_CHYBA_PRI_VSTUPU;
+                    }
+                }
+                else if (tmp3->type == TYPEDOUBLE) {
+                    if (scanf("%lf", &(tmp3->data->floatNumber)) != 1) {
+                        fprintf(stderr, "Promenna je jineho typu\n");
+                        return S_CHYBA_PRI_VSTUPU;
+                    }
+                }
+                else if (tmp3->type == TYPEBOOL) {
+                    fprintf(stderr, "Do boolovske promenne se neda cist\n");
+                    return S_SEMANTICKA_CHYBA_TYPOVA;
+                }
+                break;
         }
 
         /** Posun na dalsi instrukci */
