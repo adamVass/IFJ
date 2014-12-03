@@ -12,36 +12,37 @@
 #include "interpret.h"
 #include "syntakticka_analyza.h"
 
-
 void printdata( TItem *tmp ){
     if( tmp->type == TYPESTR ){
-        printf("retezec: %s\n", tmp->data->str );
+        fprintf(stderr, "retezec: %s\n", tmp->data->str );
     }
 	else if( tmp->type == TYPEBOOL ){
-        printf("boolean: %s\n", tmp->data->boolValue ? "true" : "false");
+        fprintf(stderr, "boolean: %s\n", tmp->data->boolValue ? "true" : "false");
     }
     else if( tmp->type == TYPEINT ){
-        printf("integer: %d\n", tmp->data->intNumber );
+        fprintf(stderr, "integer: %d\n", tmp->data->intNumber );
     }
     else if( tmp->type == TYPEDOUBLE ){
-        printf("double: %lf\n", tmp->data->floatNumber );
+        fprintf(stderr, "double: %lf\n", tmp->data->floatNumber );
     }
 }
 
 void printList () {
     listIntrukci.Active = listIntrukci.First;
-    while (listIntrukci.Active != NULL) {
 
-        printf("V listu je operace %d\n", listIntrukci.Active->instruction.instructionType);
-        printf("Operand 1\t");
+    while (listIntrukci.Active != NULL) {
+        fprintf(stderr, "V listu je operace %d\n", listIntrukci.Active->instruction.instructionType);
         TItem *tmp = (TItem*)listIntrukci.Active->instruction.address1;
-        printdata(tmp);
-        tmp = (TItem*)listIntrukci.Active->instruction.address2;
-        if (tmp != NULL){
-            printf("Operand 2\t");
+        if (tmp != NULL) {
+            fprintf(stderr, "Operand 1\t");
             printdata(tmp);
         }
-
+        tmp = (TItem*)listIntrukci.Active->instruction.address2;
+        if (tmp != NULL){
+            fprintf(stderr, "Operand 2\t");
+            printdata(tmp);
+        }
+        /** Pristup k dalsimu prvku seznamu */
         listIntrukci.Active = listIntrukci.Active->nextItem;
     }
 }
@@ -73,7 +74,7 @@ int main (int argc, char *argv[]) {
     }*/
 // -----------------------------------------------------------------------------------------------------
 
-    /** Tabulka symbolu */
+    /** Tabulky symbolu */
     htInit(&ptrhtLocal);
 	htInit(&ptrhtGlobal);
 
@@ -89,7 +90,6 @@ int main (int argc, char *argv[]) {
         do ktere se bude prirazovat napr. vysledek vyrazu */
 
 	TData *datavysl = malloc(sizeof(TData));
-	datavysl->intNumber = 0;
 	htInsert(ptrhtGlobal, "vysledek", datavysl, TYPEDOUBLE, ID_GLOBAL);
     //htPrintTable(ptrhtGlobal);
 
@@ -100,14 +100,14 @@ int main (int argc, char *argv[]) {
     token = getNextToken();
     navrat = precedencniSA();
     if (navrat == S_BEZ_CHYB)
-        printf("Syntakticka analyza OK\n");
+        fprintf(stderr, "Syntakticka analyza OK\n");
     else
-        printf("Syntakticka analyza NO\n");
+        fprintf(stderr, "Syntakticka analyza NO\n");
 
     generateInstruction(OC_PRIRAZENI, htSearch(ptrhtLocal, neterminal.polozkaTS.key), NULL, htSearch(ptrhtGlobal, "vysledek"));
 
     tChyba navr_kod = interpret();
-    printf("Navratovy kod interpretu: %d\n", navr_kod);
+    fprintf(stderr, "Navratovy kod interpretu: %d\n", navr_kod);
 
     /** Vytisk seznamu instrukci */
     //printList();
@@ -126,17 +126,14 @@ int main (int argc, char *argv[]) {
         if (vysledek->type == TYPEINT) {
                 printf("Vysledek typu int %d\n", vysledek->data->intNumber);
             }
-            else if (vysledek->type == TYPEBOOL) {
-                printf("Vysledek typu boolean %s\n", vysledek->data->boolValue ? "true" : "false");
-            }
-            else if (vysledek->type == TYPEDOUBLE) {
-                printf("Vysledek typu double %lf\n", vysledek->data->floatNumber);
-            }
+        else if (vysledek->type == TYPEBOOL) {
+            printf("Vysledek typu boolean %s\n", vysledek->data->boolValue ? "true" : "false");
+        }
+        else if (vysledek->type == TYPEDOUBLE) {
+            printf("Vysledek typu double %lf\n", vysledek->data->floatNumber);
+        }
     }*/
 // -----------------------------------------------------------------------------------------------------
-
-
-
 
     /* Syntakticka analyza
     int navrat;
