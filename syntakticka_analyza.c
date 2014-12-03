@@ -16,7 +16,6 @@
 
 //deklarace funkci, ktere budou zmineny driv, nez budou implementovany
 int dtype;
-TData *dat;
 bool init;
 bool prirovnani;
 int pocitadlo;
@@ -114,9 +113,6 @@ tChyba PROGRAM () {					//funkce na pravidlo PROGRAM -> FUNKCE . eof
 
 tChyba FUNKCE() {
 	int analyza;
-	dat = (TData*)malloc(sizeof(TData));
-	dat->param.numParam = 0;				//nulovani pocitadla parametru funkce pokazde, kdyz se uklada funkce do tabulky
-
 						//opet lokalni promenna, stejna funkce jako ve funkci nahore
 	TItem *nasel;
 	if(!strcmp(token.data, "begin") && token.stav == s_klicove) {
@@ -146,7 +142,8 @@ tChyba FUNKCE() {
 			if((funkce = malloc(strlen(token.data)+1)) == NULL) {	
 				return S_INTERNI_CHYBA;
 			}
-			
+			TData *dat = (TData*)malloc(sizeof(TData));
+			dat->param.numParam = 0;
 			
 			strcpy(funkce, token.data);
 			nasel = htSearch(ptrhtGlobal,funkce);		//pokud id funkce jiz je v globalni hash tabulce a nejedna se o doprednou deklaraci -> chyba
@@ -157,6 +154,7 @@ tChyba FUNKCE() {
 			}
 
 			htInsert(ptrhtGlobal,funkce,dat, 4,0);		//vlozeni nazvu funkce do globalni hash
+
 			token = getNextToken();
 			if(token.stav == s_lex_error) {
 			return S_LEXIKALNI_CHYBA;

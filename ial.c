@@ -8,6 +8,9 @@ tChyba htCompleteInsert( tHTable *ptrht, char *key, int druh, int type, bool ini
 	if( !tmp ){
 		return S_INTERNI_CHYBA;
 	}
+	if( !tmp->data ){
+		tmp->data = (TData*)malloc(sizeof(TData));
+	}
 	tmp->druh = druh;
 	tmp->type = type;
 	tmp->init = init;
@@ -19,6 +22,7 @@ tChyba htParamInsert( tHTable *ptrht, char *key, char *param, int type )
 	if( !ptrht || !param || !key ){
 		return S_INTERNI_CHYBA;
 	}
+	
 	//najdeme funkci
 	TItem *tmp = (*ptrht)[hashCode(key)];
 	if( !tmp ){
@@ -118,6 +122,10 @@ tChyba htDeclInsert( tHTable *ptrht, char *key, int type, int druh ) {
 	
 	TItem *new = (TItem*)malloc(sizeof(struct TItem));
 	if( !new ){
+		return S_INTERNI_CHYBA;
+	}
+	new->data = (TData*)malloc(sizeof(TData));
+	if( !new->data ){
 		return S_INTERNI_CHYBA;
 	}
 	new->key = malloc(strlen(key)+1);
