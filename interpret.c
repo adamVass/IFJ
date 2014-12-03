@@ -342,6 +342,27 @@ tChyba interpret() {
                     return S_SEMANTICKA_CHYBA_TYPOVA;
                 }
                 break;
+
+            case OC_PRIRAZENI:
+                if (tmp1->type == tmp3->type) {
+                    if (tmp1->type == TYPEINT) {
+                        tmp3->data->intNumber = tmp1->data->intNumber;
+                    }
+                    else if (tmp1->type == TYPEDOUBLE) {
+                        tmp3->data->floatNumber = tmp1->data->floatNumber;
+                    }
+                    else if (tmp1->type == TYPEBOOL) {
+                        tmp3->data->boolValue = tmp1->data->boolValue;
+                    }
+                    else if (tmp1->type == TYPESTR) {
+                        tmp3->data->str = tmp1->data->str;
+                    }
+                }
+                else {
+                    return S_SEMANTICKA_CHYBA_TYPOVA;
+                }
+
+                break;
         }
 
         /** Posun na dalsi instrukci */
