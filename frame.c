@@ -161,30 +161,11 @@ tChyba copyTable( tHTable *source, tHTable *dest )
 		tmp = (*source)[i];
 		if( tmp ){
 			int ret;
-			if( tmp->type == TYPESTR ){
-				TData data;
-				data.str = allocString( tmp->data.str );
-				ret = htInsert( dest, tmp->key, data, tmp->type, tmp->druh );
-				if(ret != S_BEZ_CHYB) {
-					return ret;
-				}
+			ret = htInsert( dest, tmp->key, copyData( tmp->type, tmp->data), tmp->type, tmp->druh );
+			if(ret != S_BEZ_CHYB) {
+				return ret;
 			}
-			else if( tmp->type == ID_FUNCTION ){
-				ret = htInsert( dest, tmp->key, tmp->data, tmp->type, tmp->druh );
-				if( ret == S_INTERNI_CHYBA ){
-					return ret;
-				}
-				tmp->data.param.numParam = 0;
-				for (int i = 0; i < tmp->data.param.numParam; ++i){
-					ret = htParamInsert( dest, tmp->key, tmp->data.param.param[i], tmp->data.param.typeParam[i] );
-					if( ret == S_INTERNI_CHYBA ){
-						return ret;
-					}
-				}
-			}
-			else{
-				htInsert( dest, tmp->key, tmp->data, tmp->type, tmp->druh );	
-			}
+
 			ret = htCompleteInsert(dest, tmp->key, tmp->druh, tmp->type, tmp->init);
 			if(ret != S_BEZ_CHYB) {
 				return ret;

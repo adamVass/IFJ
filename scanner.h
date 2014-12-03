@@ -48,8 +48,7 @@ typedef enum {
     s_carka,            /** 33.     ,       */
     s_strednik,         /** 34.     ;       */
     s_pocatecni_nuly,   /** 35. ignorujeme  */
-    s_poc_nuly_exp,     /** 36. ignorujeme  */
-    s_konec             /** 37. konecny stav*/
+    s_poc_nuly_exp      /** 36. ignorujeme  */
 } tStav;
 
 /**

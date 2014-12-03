@@ -182,7 +182,7 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
             prevedenyToken->symbol = ID;
             prevedenyToken->polozkaTS.key = tmp->key;
             prevedenyToken->polozkaTS.type = tmp->type;
-            prevedenyToken->polozkaTS.data = tmp->data;
+            prevedenyToken->polozkaTS.data = copyData( tmp->type, tmp->data);
             prevedenyToken->polozkaTS.ptrnext = tmp->ptrnext;
         }
     }
@@ -209,10 +209,11 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
         prevedenyToken->symbol = ID;
         prevedenyToken->polozkaTS.type = TYPEBOOL;
         prevedenyToken->polozkaTS.druh = 0;
+        prevedenyToken->polozkaTS.data = (TData*)malloc( sizeof(TData) );
         if (!strcmp(token.data, "true"))
-            prevedenyToken->polozkaTS.data.boolValue = true;
+            prevedenyToken->polozkaTS.data->boolValue = true;
         else
-            prevedenyToken->polozkaTS.data.boolValue = false;
+            prevedenyToken->polozkaTS.data->boolValue = false;
 
         /** Existenci v TS resit nemusime, protoze promenna ma unikatni nazev */
         htInsert(ptrhtLocal, prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
@@ -227,9 +228,8 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
         prevedenyToken->symbol = ID;
         prevedenyToken->polozkaTS.type = TYPESTR;
         prevedenyToken->polozkaTS.druh = 0;
-
-        prevedenyToken->polozkaTS.data.str = malloc(strlen(token.data)+1);
-        strcpy(prevedenyToken->polozkaTS.data.str, token.data);
+        prevedenyToken->polozkaTS.data = (TData*)malloc(sizeof(TData));
+        prevedenyToken->polozkaTS.data->str = allocString(token.data);
         htInsert(ptrhtLocal, prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
 
     }
@@ -243,7 +243,8 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
         prevedenyToken->symbol = ID;
         prevedenyToken->polozkaTS.type = TYPEINT;
         prevedenyToken->polozkaTS.druh = 0;
-        prevedenyToken->polozkaTS.data.intNumber = atoi(token.data);
+        prevedenyToken->polozkaTS.data = (TData*)malloc(sizeof(TData));
+        prevedenyToken->polozkaTS.data->intNumber = atoi(token.data);
 
         htInsert(ptrhtLocal, prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
 
@@ -257,7 +258,8 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
         prevedenyToken->symbol = ID;
         prevedenyToken->polozkaTS.type = TYPEDOUBLE;
         prevedenyToken->polozkaTS.druh = 0;
-        prevedenyToken->polozkaTS.data.floatNumber = atof(token.data);
+        prevedenyToken->polozkaTS.data = (TData*)malloc(sizeof(TData));
+        prevedenyToken->polozkaTS.data->floatNumber = atof(token.data);
 
         htInsert(ptrhtLocal, prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
 
@@ -437,7 +439,7 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
                         zasobnikPush(zasobnik1, neterminal);
 
                         /** Vlozeni do TS */
-                        htInsert(ptrhtLocal, neterminal.polozkaTS.key, neterminal.polozkaTS.data, neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
+                        htInsert(ptrhtLocal, neterminal.polozkaTS.key, copyData( neterminal.polozkaTS.type, neterminal.polozkaTS.data ), neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
 
                         /** Vlozeni instrukce do seznamu */
                         generateInstruction(operace, htSearch(ptrhtLocal, prectiTerminal.polozkaTS.key), htSearch(ptrhtLocal, prectiTerminal3.polozkaTS.key), htSearch(ptrhtLocal, neterminal.polozkaTS.key));
@@ -455,7 +457,7 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
                         zasobnikPush(zasobnik1, neterminal);
 
                         /** Vlozeni do TS */
-                        htInsert(ptrhtLocal, neterminal.polozkaTS.key, neterminal.polozkaTS.data, neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
+                        htInsert(ptrhtLocal, neterminal.polozkaTS.key, copyData( neterminal.polozkaTS.type, neterminal.polozkaTS.data ), neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
 
                         /** Vlozeni instrukce do seznamu */
                         generateInstruction(operace, htSearch(ptrhtLocal, prectiTerminal.polozkaTS.key), htSearch(ptrhtLocal, prectiTerminal3.polozkaTS.key), htSearch(ptrhtLocal, neterminal.polozkaTS.key));

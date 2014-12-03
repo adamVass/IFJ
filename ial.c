@@ -25,29 +25,29 @@ tChyba htParamInsert( tHTable *ptrht, char *key, char *param, int type )
 		return S_INTERNI_CHYBA;
 	}
 	//+1 parametr
-	tmp->data.param.numParam++;
+	tmp->data->param.numParam++;
 	//alokuju vetsi potrebne pole parametru a typu
-	char **tmpParam = (char**)malloc( sizeof(char*)*tmp->data.param.numParam );
-	int *tmpTypeParam = (int*)malloc( sizeof(int)*tmp->data.param.numParam );
+	char **tmpParam = (char**)malloc( sizeof(char*)*tmp->data->param.numParam );
+	int *tmpTypeParam = (int*)malloc( sizeof(int)*tmp->data->param.numParam );
 	//prekopiruju
-	for (int i = 0; i < tmp->data.param.numParam - 1 ; ++i){
-		tmpParam[i] = tmp->data.param.param[i];
-		tmpTypeParam[i] = tmp->data.param.typeParam[i];
+	for (int i = 0; i < tmp->data->param.numParam - 1 ; ++i){
+		tmpParam[i] = tmp->data->param.param[i];
+		tmpTypeParam[i] = tmp->data->param.typeParam[i];
 	}
 	// kopie parametru - char *param 
 	char *tmpChar = (char*)malloc( strlen(param)+1 );
 	strcpy( tmpChar, param );
 	//pridani noveho parametru a jeho typu 
-	tmpParam[tmp->data.param.numParam-1] = tmpChar;
-	tmpTypeParam[tmp->data.param.numParam-1] = type;
+	tmpParam[tmp->data->param.numParam-1] = tmpChar;
+	tmpTypeParam[tmp->data->param.numParam-1] = type;
 	//uvolneni starych poli
-	if( tmp->data.param.numParam != 1 ){
-		free(tmp->data.param.param);
-		free(tmp->data.param.typeParam);
+	if( tmp->data->param.numParam != 1 ){
+		free(tmp->data->param.param);
+		free(tmp->data->param.typeParam);
 	}
 	//predani pointru
-	tmp->data.param.param = tmpParam;
-	tmp->data.param.typeParam = tmpTypeParam;
+	tmp->data->param.param = tmpParam;
+	tmp->data->param.typeParam = tmpTypeParam;
 	return S_BEZ_CHYB;
 }
 
@@ -144,7 +144,36 @@ tChyba htDeclInsert( tHTable *ptrht, char *key, int type, int druh ) {
 ** tedy proveďte.vložení prvku na začátek seznamu.
 **/
 
-tChyba htInsert ( tHTable *ptrht, char *key, TData data, int type, int druh ) {
+TData* copyData( int type, TData *data )
+{
+	TData *tmp = (TData*)malloc(sizeof(TData));
+
+	if( type == TYPESTR ){
+		tmp->str = allocString( data->str );
+	}
+	else if( type == TYPEBOOL ){
+		tmp->boolValue = data->boolValue;
+	}
+	else if( type == TYPEINT ){
+		tmp->intNumber = data->intNumber;
+	}
+	else if( type == TYPEDOUBLE ){
+		tmp->floatNumber = data->floatNumber;
+	}
+	else if( type == ID_FUNCTION ){
+		tmp->param.numParam = data->param.numParam;
+		//alokuju vetsi potrebne pole parametru a typu
+		tmp->param.param = (char**)malloc( sizeof(char*)*tmp->param.numParam );
+		tmp->param.typeParam = (int*)malloc( sizeof(int)*tmp->param.numParam );
+		for (int i = 0; i < data->param.numParam; ++i){
+			tmp->param.param[i] = allocString( data->param.param[i] );
+			tmp->param.typeParam[i] = data->param.typeParam[i];
+		}
+	}
+	return tmp;
+}
+
+tChyba htInsert ( tHTable *ptrht, char *key, TData *data, int type, int druh ) {
 
 	if( !ptrht || !key ){
 		return S_INTERNI_CHYBA;
@@ -156,16 +185,7 @@ tChyba htInsert ( tHTable *ptrht, char *key, TData data, int type, int druh ) {
 	}
 	new->key = malloc(strlen(key)+1);
 	strcpy(new->key, key);
-	
-	if( type == TYPESTR ){
-		
-		new->data.str = malloc( strlen(data.str)+1 );
-		if( !new->data.str ){
-			return S_INTERNI_CHYBA;
-		}
-		strcpy( new->data.str, data.str );
-	}
-	else new->data = data;
+	new->data = data;
 	new->type = type;
 	new->druh = druh;
 	int hashKey = hashCode(key);
@@ -193,7 +213,7 @@ TData* htRead( tHTable *ptrht, char *key ) {
 	if( !tmp ){
 		return NULL;
 	}
-	return &tmp->data;
+	return tmp->data;
 }
 
 /*
@@ -254,7 +274,7 @@ tChyba htClearAll( tHTable *ptrht ) {
  			tmp = (*ptrht)[i];
  			(*ptrht)[i] = (*ptrht)[i]->ptrnext;
  			if( tmp->type == 0 ){
- 				free( tmp->data.str );
+ 				free( tmp->data->str );
  			}
  			free( tmp->key );
  			free( tmp );

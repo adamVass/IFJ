@@ -82,7 +82,7 @@ void tokenClear(tToken *s) {
 }
 
 tToken getNextToken() {
-    int c, pom, pom_escape;
+    int c, pom, cislo;
     int stav = s_start;
 
     /** Vymazeme obsah tokenu a v pripade retezce jej budeme ukladat */
@@ -178,13 +178,14 @@ tToken getNextToken() {
                 ungetc(c, f);                   /** Je potreba vratit posledni nacteny znak */
                 stav = checkKeyWords(token.data);
                 tokenChangeState(&token, stav);
-                stav = s_konec;
+                return token;
             }
             break;
 
         case s_pocatecni_nuly:                  /** Pocatecni nuly u cisel budeme ignorovat */
             if (c == '0') {
                 stav = s_pocatecni_nuly;
+                break;
             }
             else if ((c != '0') && isdigit(c)) {
                 stav = s_cele_cislo;
@@ -231,7 +232,7 @@ tToken getNextToken() {
                 ungetc(c, f);
                 stav = s_cele_cislo;
                 tokenChangeState(&token, stav);
-                stav = s_konec;
+                return token;
             }
             break;
 
@@ -243,6 +244,8 @@ tToken getNextToken() {
             }
             else {
                 stav = s_lex_error;
+                tokenChangeState(&token, stav);
+                return token;
             }
             break;
 
@@ -259,13 +262,14 @@ tToken getNextToken() {
             }
             else {
                 ungetc(c, f);
-                stav = s_konec;
+                return token;
             }
             break;
 
         case s_poc_nuly_exp:
             if (c == '0') {
                 stav = s_poc_nuly_exp;
+                break;
             }
             else if ((c != '0') && isdigit(c)) {
                 stav = s_desetinne_cislo;
@@ -274,6 +278,8 @@ tToken getNextToken() {
             }
             else {
                 stav = s_lex_error;
+                tokenChangeState(&token, stav);
+                return token;
             }
             break;
 
@@ -284,6 +290,7 @@ tToken getNextToken() {
             }
             else if (c == '0') {
                 stav = s_poc_nuly_exp;          /** Kontrola nul u exponentu */
+                break;
             }
             else if (isdigit(c)) {
                 tokenEdit(&token, c);
@@ -291,7 +298,9 @@ tToken getNextToken() {
             }
             else {                              /** Jinak chyba */
                 stav = s_lex_error;
+                tokenChangeState(&token, stav);
                 ungetc(c, f);
+                return token;
             }
             break;
 
@@ -303,10 +312,13 @@ tToken getNextToken() {
             }
             else if (c == '0') {
                 stav = s_poc_nuly_exp;          /** Kontrola nul u exponentu */
+                break;
             }
             else {                              /** Jinak chyba */
                 stav = s_lex_error;
+                tokenChangeState(&token, stav);
                 ungetc(c, f);
+                return token;
             }
             break;
 
@@ -320,7 +332,7 @@ tToken getNextToken() {
                 stav = s_desetinne_cislo;
                 tokenChangeState(&token, stav);
                 ungetc(c, f);
-                stav = s_konec;
+                return token;
             }
             break;
 
@@ -334,13 +346,13 @@ tToken getNextToken() {
                 stav = s_dvojtecka;
                 tokenChangeState(&token, stav);
                 ungetc(c, f);
-                stav = s_konec;
+                return token;
             }
             break;
 
         case s_prirazeni:
             ungetc(c, f);
-            stav = s_konec;
+            return token;
             break;
 
         case s_mensi:
@@ -358,12 +370,11 @@ tToken getNextToken() {
                 ungetc(c, f);
                 stav = s_mensi;
                 tokenChangeState(&token, stav);
-                stav = s_konec;
+                return token;
             }
-            break;
 
         case s_nerovno:
-            stav = s_konec;
+            return token;
             break;
 
         case s_vetsi:
@@ -376,12 +387,11 @@ tToken getNextToken() {
                 ungetc(c, f);
                 stav = s_vetsi;
                 tokenChangeState(&token, stav);
-                stav = s_konec;
+                return token;
             }
-            break;
 
         case s_vetsi_rovno:
-            stav = s_konec;
+            return token;
             break;
 
         case s_komentar:                            /** Komentar, do tokenu jej nebudeme ukladat */
@@ -394,6 +404,8 @@ tToken getNextToken() {
                     zda neprijde EOF (neukonceny komentar). */
                 if (c == EOF) {
                     stav = s_lex_error;
+                    tokenChangeState(&token, stav);
+                    return token;
                 }
             }
             break;
@@ -402,10 +414,12 @@ tToken getNextToken() {
             if (c == 39) {
                 stav = s_string_escape_pom;         /** Overime, jestli retezec konci nebo pokracuje escape sekvenci*/
                 pom = 0;
-                pom_escape = 0;
+                cislo = 0;
             }
             else if (c < 31) {                      /** Nepovolene znaky */
                 stav = s_lex_error;
+                tokenChangeState(&token, stav);
+                return token;
             }
             else {                                  /** Jinak normalne ukladame znaky do retezce */
                 tokenEdit(&token, c);
@@ -416,52 +430,57 @@ tToken getNextToken() {
             if (c == '#') {
                 int znak = '\\';
                 pom = pom*10+znak;
-                stav = s_string_escape_nuly;        /** Prebytecne pocatecni nuly v escape sekvenci ignorujeme */
+                stav = s_string_escape_nuly;        /** Overime cislo #i, kde i nalezi <1;255>, prebytecne poc. nuly ignorujeme */
                 tokenChangeState(&token, stav);
             }
             else if (c == 39) {
                 tokenEdit(&token, 39);
                 stav = s_string;
+                break;
             }
             else {                                  /** Neni escape sekvence ale konec retezce */
                 ungetc(c, f);                       /** Je nutne vratit jeden znak */
                 stav = s_string;
+                //tokenEdit(&token, c);
                 tokenChangeState(&token, stav);
-                stav = s_konec;
+                return token;
             }
             break;
 
         case s_string_escape:
-            if (c == 39) {                          /** Konci escape sekvence, takze pridame znak */
-                if (pom_escape >= 1 && pom_escape <= 255) {
-                    tokenEdit(&token, pom);         /** Jestli cislo i (z #i) nalezi <1;255>, vlozime znak do retezce */
-                    stav = s_string;
-                    break;
+            if (c == 39) {
+                if (cislo > 3) {                    /**Cisla v escape sekvenci mohou byt maximalne trojmistna */
+                    stav = s_lex_error;
+                    tokenChangeState(&token, stav);
+                    return token;
                 }
                 else {
-                    stav = s_lex_error;
+                    tokenEdit(&token, pom);         /** Konci escape sekvence, takze pridame znak */
+                    stav = s_string;
+                    break;
+
                 }
             }
             else if (isdigit(c)) {
                     pom = pom*10+c;
-                    pom_escape = pom_escape*10+(c - '0');
+                    cislo++;
             }
             else {
                 stav = s_lex_error;
+                tokenChangeState(&token, stav);
+                return token;
             }
             break;
 
         case s_string_escape_nuly:                  /** Odstraneni pocatecnich nul v escape sekvenci */
             if (c == '0') {
                 stav = s_string_escape_nuly;
+                break;
             }
             else if (c != '0' && isdigit(c)) {
                 stav = s_string_escape;
                 pom = pom*10+c;
-                pom_escape = pom_escape*10+(c - '0');
-            }
-            else {
-                stav = s_lex_error;
+                cislo++;
             }
             break;
 
@@ -475,18 +494,17 @@ tToken getNextToken() {
         case s_tecka:
         case s_leva_zavorka:
         case s_prava_zavorka:
-        case s_eof:
             ungetc(c, f);
             tokenChangeState(&token, stav);
-            stav = s_konec;
-            break;
+            return token;
 
         case s_lex_error:
             tokenChangeState(&token, stav);
             return token;
 
-        case s_konec:
+        case s_eof:
             ungetc(c, f);
+            tokenChangeState(&token, stav);
             return token;
         }
     }

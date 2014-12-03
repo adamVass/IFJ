@@ -16,7 +16,7 @@
 
 //deklarace funkci, ktere budou zmineny driv, nez budou implementovany
 int dtype;
-TData dat;
+TData *dat;
 bool init;
 bool prirovnani;
 int pocitadlo;
@@ -44,8 +44,8 @@ void htPrintTable( tHTable *ptrht ) {
 	if( ptr->druh == 7 ){ // string
 	printf(" %d ", ptr->druh);
 
-	for (int i = 0; i < ptr->data.param.numParam; i++){
-		printf("%s ", ptr->data.param.param[i]);
+	for (int i = 0; i < ptr->data->param.numParam; i++){
+		printf("%s ", ptr->data->param.param[i]);
 		
 	}
 }
@@ -114,6 +114,9 @@ tChyba PROGRAM () {					//funkce na pravidlo PROGRAM -> FUNKCE . eof
 
 tChyba FUNKCE() {
 	int analyza;
+	dat = (TData*)malloc(sizeof(TData));
+	dat->param.numParam = 0;				//nulovani pocitadla parametru funkce pokazde, kdyz se uklada funkce do tabulky
+
 						//opet lokalni promenna, stejna funkce jako ve funkci nahore
 	TItem *nasel;
 	if(!strcmp(token.data, "begin") && token.stav == s_klicove) {
@@ -145,7 +148,6 @@ tChyba FUNKCE() {
 			}
 			
 			
-			dat.param.numParam = 0;				//nulovani pocitadla parametru funkce pokazde, kdyz se uklada funkce do tabulky
 			strcpy(funkce, token.data);
 			nasel = htSearch(ptrhtGlobal,funkce);		//pokud id funkce jiz je v globalni hash tabulce a nejedna se o doprednou deklaraci -> chyba
 			if(nasel != NULL ) {
@@ -728,8 +730,8 @@ tChyba DOPREDNE() {
 
 		nasel = htSearch(ptrhtGlobal, funkce);		//nakopirovani parametru do lokalniho ramce
 		if(nasel != NULL) {
-			for(int i=0; i < nasel->data.param.numParam; i++) {
-				htDeclInsert(ptrhtLocal, nasel->data.param.param[i], nasel->data.param.typeParam[i], ID_PARAM);	
+			for(int i=0; i < nasel->data->param.numParam; i++) {
+				htDeclInsert(ptrhtLocal, nasel->data->param.param[i], nasel->data->param.typeParam[i], ID_PARAM);	
 			}
 		}	
 		return ACT_LIST();
@@ -1346,7 +1348,7 @@ tChyba TERM2() {
 			pt2 = searchFrames(token.data, ptrhtLocal, ptrhtGlobal);
 			if(pt2 != NULL) {
 				if(pt2->init != false) {
-					if(pt->data.param.typeParam[pocitadlo] != pt2->type) {
+					if(pt->data->param.typeParam[pocitadlo] != pt2->type) {
 						return S_SEMANTICKA_CHYBA_TYPOVA;
 					}	
 				}
@@ -1361,7 +1363,7 @@ tChyba TERM2() {
 			bylo_id = false;
 		}
 		else {
-			if(token.stav != pt->data.param.typeParam[pocitadlo]) {
+			if(token.stav != pt->data->param.typeParam[pocitadlo]) {
 			return S_SEMANTICKA_CHYBA_TYPOVA;
 			}
 		}
@@ -1390,7 +1392,7 @@ tChyba TERM2() {
 			if(bylo_id == true) {
 				pt2 = searchFrames(token.data, ptrhtLocal, ptrhtGlobal);
 				if(pt2 != NULL) {
-					if(pt->data.param.typeParam[pocitadlo] != pt2->type) {
+					if(pt->data->param.typeParam[pocitadlo] != pt2->type) {
 						return S_SEMANTICKA_CHYBA_TYPOVA;
 					}
 				}
@@ -1401,7 +1403,7 @@ tChyba TERM2() {
 				bylo_id = false;
 			}
 			else {
-				if(token.stav != pt->data.param.typeParam[pocitadlo]) {
+				if(token.stav != pt->data->param.typeParam[pocitadlo]) {
 				return S_SEMANTICKA_CHYBA_TYPOVA;
 				}
 			}
@@ -1417,7 +1419,7 @@ tChyba TERM2() {
 	}
 	else if(token.stav == s_prava_zavorka) {
 		pt = htSearch(ptrhtGlobal, porovnani);			//zjistime, zda pocet zadanych parametru odpovida poctu parametru pri deklaraci funkce
-		if(pocitadlo != pt->data.param.numParam) {
+		if(pocitadlo != pt->data->param.numParam) {
 			return S_SEMANTICKA_CHYBA_TYPOVA;
 		}
 		

@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include "navratova_hodnota.h"
+#include "mystring.h"
 
 #define MAX_HTSIZE 61
 
@@ -48,7 +49,7 @@ typedef union TData{
 /*Datová položka TRP s explicitně řetězenými synonymy*/
  typedef struct TItem{
    char *key;            /* klíč  */
-   TData data;          /* obsah */
+   TData *data;          /* obsah */
    int type;
    int druh;
    bool init;           /*deklarovana/nedeklarovana a inicializovana a neicializovana*/
@@ -87,7 +88,7 @@ tChyba htInit( tHTable **ptrht );
 
 TItem* htSearch( tHTable *ptrht, char *key );
 
-tChyba htInsert( tHTable *ptrht, char *key, TData data, int type, int druh );
+tChyba htInsert( tHTable *ptrht, char *key, TData *data, int type, int druh );
 
 tChyba htDeclInsert( tHTable *ptrht, char *key, int type, int druh );
 
@@ -96,6 +97,8 @@ TData* htRead( tHTable *ptrht, char *key );
 tChyba htDelete( tHTable *ptrht, char *key );
 
 tChyba htClearAll( tHTable *ptrht );
+
+TData* copyData( int type, TData *data );
 
 char *strCopy(char *str, unsigned int s, unsigned int n);
 
