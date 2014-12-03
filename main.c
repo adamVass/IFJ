@@ -1,57 +1,46 @@
 /****************************************/
 /**  Projekt pro IFJ/IAL                */
 /**  Main interpretu                    */
-/**  Autor: Martin JosefÃ­k              */
+/**  Autor: Martin Josefík              */
 /**  email: xjosef00@stud.fit.vutbr.cz  */
 /****************************************/
 
-
 #include <stdio.h>
 #include <stdlib.h>
-#include "syntakticka_analyza.h"
+#include "ilist.h"
+#include "precedencni_analyza.h"
+#include "interpret.h"
+//#include "syntakticka_analyza.h"
 
 
-/*void htPrintTable( tHTable *ptrht ) {
-int maxlen = 0;
-int sumcnt = 0;
-printf ("------------HASH TABLE--------------\n");
-for ( int i=0; i<HTSIZE; i++ ) {
-printf ("%i:",i);
-int cnt = 0;
-TItem* ptr = (*ptrht)[i];
-while ( ptr != NULL ) {
-printf (" (%s)",ptr->key); // vytiskne klic
-if( ptr->druh == 5 ){ // string
-printf(" %d ", ptr->druh);
+void printdata( TItem *tmp ){
+    if( tmp->type == 0 ){
+        printf("retezec: %s\n", tmp->data->str );
+    }
+	else if( tmp->type == 1 ){
+        printf("boolean: %s\n", tmp->data->boolValue ? "true" : "false");
+    }
+    else if( tmp->type == 2 ){
+        printf("integer: %d\n", tmp->data->intNumber );
+    }
+    else if( tmp->type == 3 ){
+        printf("double: %lf\n", tmp->data->floatNumber );
+    }
+}
 
-for (int i = 0; i < ptr->data.param.numParam; i++){
-		printf("%s ", ptr->data.param.param[i]);
-		
-	}
-}
-else if( ptr->druh == 6 ){ // bool
-printf(" %d", ptr->druh);
-}
-else if( ptr->druh == 7 ){ // int
-printf(" %d", ptr->druh);
-}
-else if( ptr->druh == 8 ){ // double
+void printList () {
+    while (listIntrukci.First != NULL) {
 
-printf(" %d", ptr->druh);
+        printf("V listu je operace %d\n", listIntrukci.First->instruction.instructionType);
+        printf("Operand 1\n");
+        TItem *tmp = (TItem*)listIntrukci.First->instruction.address1;
+        printdata(tmp);
+        printf("Operand 2\n");
+        tmp = (TItem*)listIntrukci.First->instruction.address2;
+        printdata(tmp);
+        listIntrukci.First = listIntrukci.First->nextItem;
+    }
 }
-cnt++;
-ptr = ptr->ptrnext;
-}
-printf ("\n");
-if (cnt > maxlen)
-maxlen = cnt;
-sumcnt+=cnt;
-}
-printf ("------------------------------------\n");
-printf ("Items count %i The longest list %i\n",sumcnt,maxlen);
-printf ("------------------------------------\n");
-}*/
-
 
 int main (int argc, char *argv[]) {
 
@@ -66,10 +55,11 @@ int main (int argc, char *argv[]) {
         fprintf(stderr, "Soubor nejde otevrit\n");
         return S_INTERNI_CHYBA;
     }
-	setSourceFile(f);
+    setSourceFile(f);
 
     /** Test lexikalniho analyzatoru */
     /*tToken navrat;
+    tokenInit(&token);
     int stav = s_start;
     while (stav != s_eof) {
         navrat = getNextToken();
@@ -78,9 +68,13 @@ int main (int argc, char *argv[]) {
     }*/
 
     /** Tabulka symbolu */
-    
+    htInit(&ptrhtLocal);
+	htInit(&ptrhtGlobal);
 
-    /*int navrat;
+    /** Seznam instrukci */
+    InitList (&listIntrukci);
+
+    int navrat;
     tokenInit(&token);
     token = getNextToken();
     navrat = precedencniSA();
@@ -89,29 +83,39 @@ int main (int argc, char *argv[]) {
     else
         printf("Syntakticka analyza NO\n");
 
-    TItem* tmp = htSearch("$3");
-	if (tmp != NULL) {
-		printf("TS KEY: %s\n", tmp->key);
-        	printf("TS DATA.intNumber: %d\n", tmp->data.intNumber);
-        	printf("TS TYPE: %d\n", tmp->type);
-	}
-	else {
-		printf("neni v tabulce\n");
-	}*/
+    //printList();
 
-   
+    tChyba navr_kod = interpret();
+    printf("Navratovy kod interpretu: %d\n", navr_kod);
 
-    int navrat;
+        /** Takto se pristupuje k vysledku vyrazu */
+        TItem *vysledek = htSearch(ptrhtLocal, neterminal.polozkaTS.key);
+
+if (vysledek != NULL) {
+	if (vysledek->type == TYPEINT) {
+            printf("Vysledek typu int %d\n", vysledek->data->intNumber);
+        }
+        else if (vysledek->type == TYPEBOOL) {
+            printf("Vysledek typu boolean %s\n", vysledek->data->boolValue ? "true" : "false");
+        }
+        else if (vysledek->type == TYPEDOUBLE) {
+            printf("Vysledek typu double %lf\n", vysledek->data->floatNumber);
+        }
+}
+        
+
+
+
+
+    /*int navrat;
     navrat = syntakticka_anal();
-    htPrintTable(ptrhtGlobal);
-    htPrintTable(func[0].table);
-    htPrintTable(ptrhtLastLocal);
-    htPrintTable(ptrTables[0].table);
     if(navrat == S_BEZ_CHYB)
-        printf("SYN OK\n");
+        fprintf(stderr, "SYN OK\n");
     else
-        printf("SYN NO\n %d", navrat);
-    //htPrintTable( ptrhtGlobal );
+        fprintf(stderr, "SYN NO\n");
+
+	fprintf(stderr, "Navratova hodnota parseru: %d\n", navrat);*/
+
 
     return 0;
 }
