@@ -40,6 +40,9 @@ tChyba interpret() {
                     tmp3->type = TYPEDOUBLE;
                     tmp3->data->floatNumber = tmp1->data->floatNumber + tmp2->data->floatNumber;
                 }
+                else if (tmp1->type == TYPESTR && tmp2->type == TYPESTR) {
+                    /** Konkatenace retezcu */
+                }
                 else {
                     /** Jine kombinace operandu nejsou dovoleny */
                     return S_SEMANTICKA_CHYBA_TYPOVA;
@@ -148,7 +151,15 @@ tChyba interpret() {
                         tmp3->data->boolValue = false;
                     }
                 }
-                // pridat porovnani retezcu
+                else if (tmp1->type == TYPESTR && tmp2->type == TYPESTR) {
+                    tmp3->type = TYPEBOOL;
+                    if (!strcmp(tmp1->data->str, tmp2->data->str)) {
+                        tmp3->data->boolValue = true;
+                    }
+                    else {
+                        tmp3->data->boolValue = false;
+                    }
+                }
                 else {
                     /** Operandy nejsou stejneho typu, tudiz dojde k semanticke chybe c. 4 */
                     tmp3->type = TYPEBOOL;
@@ -186,7 +197,15 @@ tChyba interpret() {
                         tmp3->data->boolValue = false;
                     }
                 }
-                // pridat nerovno retezcu
+                else if (tmp1->type == TYPESTR && tmp2->type == TYPESTR) {
+                    tmp3->type = TYPEBOOL;
+                    if (strcmp(tmp1->data->str, tmp2->data->str)) {
+                        tmp3->data->boolValue = true;
+                    }
+                    else {
+                        tmp3->data->boolValue = false;
+                    }
+                }
                 else {
                     /** Operandy nejsou stejneho typu, tudiz dojde k semanticke chybe c. 4 */
                     tmp3->type = TYPEBOOL;
@@ -223,7 +242,16 @@ tChyba interpret() {
                         tmp3->data->boolValue = false;
                     }
                 }
-                // pridat porovnani retezcu
+                else if (tmp1->type == TYPESTR && tmp2->type == TYPESTR) {
+                    tmp3->type = TYPEBOOL;
+                    int rozdil;
+                    if ((rozdil = strcmp(tmp1->data->str, tmp2->data->str)) < 0) {
+                        tmp3->data->boolValue = true;
+                    }
+                    else {
+                        tmp3->data->boolValue = false;
+                    }
+                }
                 else {
                     /** Operandy nejsou stejneho typu, tudiz dojde k semanticke chybe c. 4 */
                     tmp3->type = TYPEBOOL;
@@ -260,7 +288,16 @@ tChyba interpret() {
                         tmp3->data->boolValue = false;
                     }
                 }
-                // pridat porovnani retezcu
+                else if (tmp1->type == TYPESTR && tmp2->type == TYPESTR) {
+                    tmp3->type = TYPEBOOL;
+                    int rozdil;
+                    if ((rozdil = strcmp(tmp1->data->str, tmp2->data->str)) <= 0) {
+                        tmp3->data->boolValue = true;
+                    }
+                    else {
+                        tmp3->data->boolValue = false;
+                    }
+                }
                 else {
                     /** Operandy nejsou stejneho typu, tudiz dojde k semanticke chybe c. 4 */
                     tmp3->type = TYPEBOOL;
@@ -297,7 +334,16 @@ tChyba interpret() {
                         tmp3->data->boolValue = false;
                     }
                 }
-                // pridat porovnani retezcu
+                else if (tmp1->type == TYPESTR && tmp2->type == TYPESTR) {
+                    tmp3->type = TYPEBOOL;
+                    int rozdil;
+                    if ((rozdil = strcmp(tmp1->data->str, tmp2->data->str)) > 0) {
+                        tmp3->data->boolValue = true;
+                    }
+                    else {
+                        tmp3->data->boolValue = false;
+                    }
+                }
                 else {
                     /** Operandy nejsou stejneho typu, tudiz dojde k semanticke chybe c. 4 */
                     tmp3->type = TYPEBOOL;
@@ -334,7 +380,16 @@ tChyba interpret() {
                         tmp3->data->boolValue = false;
                     }
                 }
-                // pridat porovnani retezcu
+                else if (tmp1->type == TYPESTR && tmp2->type == TYPESTR) {
+                    tmp3->type = TYPEBOOL;
+                    int rozdil;
+                    if ((rozdil = strcmp(tmp1->data->str, tmp2->data->str)) >= 0) {
+                        tmp3->data->boolValue = true;
+                    }
+                    else {
+                        tmp3->data->boolValue = false;
+                    }
+                }
                 else {
                     /** Operandy nejsou stejneho typu, tudiz dojde k semanticke chybe c. 4 */
                     tmp3->type = TYPEBOOL;
