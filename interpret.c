@@ -342,6 +342,21 @@ tChyba interpret() {
                     return S_SEMANTICKA_CHYBA_TYPOVA;
                 }
                 break;
+
+            case OC_WRITE:
+                if (tmp1->type == TYPEINT) {
+                    printf("%d", tmp1->data->intNumber);
+                }
+                else if (tmp1->type == TYPEDOUBLE) {
+                    printf("%g", tmp1->data->floatNumber);
+                }
+                else if (tmp1->type == TYPEBOOL) {
+                    printf("%s", tmp1->data->boolValue ? "TRUE" : "FALSE");
+                }
+                else if (tmp1->type == TYPESTR) {
+                    printf("%s", tmp1->data->str);
+                }
+                break;
         }
 
         /** Posun na dalsi instrukci */
