@@ -1,10 +1,6 @@
 
 function prdel (kokot : integer ; curak : integer ; pica : integer) : integer;
 begin
-kokot := 5;
-curak := 8;
-pica := kokot;
-curak := 9;
 if kokot > curak then 
 begin
 pica := kokot
@@ -13,22 +9,6 @@ begin
 curak := kokot+1
 end
 end;
-
-function chlupo (hrd : integer ; frk : string ; prd : integer) : integer;
-begin
-frk := 9;
-frk := chlupo(hrd, prd, frk);
-
-prd := 8;
-if frk > prd then 
-begin
-prd := frk
-end else
-begin
-prd := prd+1
-end
-end;
-
 
 
 var
@@ -40,15 +20,17 @@ begin
 var
 chuj : integer;
 
-a := 9;
+ahoj := 'kokote';
+write('Zadejte cislo pro vypocet faktorialu: ');
+a := 8;
 
 readln(a);
 if a < 0 then
 begin
 vysl := 5+5;
-vysl := prdel (vysl, a, vysl)
-
-
+write(vysl);
+ahoj := sort (ahoj);
+a := prdel(vysl, 8, 9)
 
 end
 else
@@ -57,8 +39,8 @@ vysl := 1;
 while a > 0 do
 
 begin
-vysl := vysl * a
-
+vysl := vysl * a;
+a := a - 1
 end;
 
 write('Vysledek je: ', vysl, ''#10'')

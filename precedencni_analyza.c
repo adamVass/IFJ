@@ -92,7 +92,7 @@ void generateVariable(tToken *var) {
 }
 
 /** Funkce vlozi instrukci do seznamu instrukci */
-void generateInstruction( int typInstrukce, void *addr1, void *addr2, void *addr3) {
+void generateInstruction(int typInstrukce, void *addr1, void *addr2, void *addr3) {
    tInst I;
    I.instructionType = typInstrukce;
    I.address1 = addr1;
@@ -182,7 +182,7 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
             prevedenyToken->symbol = ID;
             prevedenyToken->polozkaTS.key = tmp->key;
             prevedenyToken->polozkaTS.type = tmp->type;
-            prevedenyToken->polozkaTS.data = tmp->data;
+            prevedenyToken->polozkaTS.data = copyData( tmp->type, tmp->data);
             prevedenyToken->polozkaTS.ptrnext = tmp->ptrnext;
         }
     }
@@ -442,7 +442,7 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
                         htInsert(ptrhtLocal, neterminal.polozkaTS.key, copyData( neterminal.polozkaTS.type, neterminal.polozkaTS.data ), neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
 
                         /** Vlozeni instrukce do seznamu */
-                        generateInstruction(  operace, htSearch(ptrhtLocal, prectiTerminal.polozkaTS.key), htSearch(ptrhtLocal, prectiTerminal3.polozkaTS.key), htSearch(ptrhtLocal, neterminal.polozkaTS.key));
+                        generateInstruction(operace, htSearch(ptrhtLocal, prectiTerminal.polozkaTS.key), htSearch(ptrhtLocal, prectiTerminal3.polozkaTS.key), htSearch(ptrhtLocal, neterminal.polozkaTS.key));
                         return S_BEZ_CHYB;
                     }
 
@@ -460,7 +460,7 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
                         htInsert(ptrhtLocal, neterminal.polozkaTS.key, copyData( neterminal.polozkaTS.type, neterminal.polozkaTS.data ), neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
 
                         /** Vlozeni instrukce do seznamu */
-                        generateInstruction( operace, htSearch(ptrhtLocal, prectiTerminal.polozkaTS.key), htSearch(ptrhtLocal, prectiTerminal3.polozkaTS.key), htSearch(ptrhtLocal, neterminal.polozkaTS.key));
+                        generateInstruction(operace, htSearch(ptrhtLocal, prectiTerminal.polozkaTS.key), htSearch(ptrhtLocal, prectiTerminal3.polozkaTS.key), htSearch(ptrhtLocal, neterminal.polozkaTS.key));
                         return S_BEZ_CHYB;
                     }
                 }
@@ -479,7 +479,6 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
 }
 
 tChyba precedencniSA() {
-
     int precti = 1;
     tChyba navrat;
     tData dolar;

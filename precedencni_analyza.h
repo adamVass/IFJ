@@ -12,8 +12,6 @@
 #include "scanner.h"
 #include "ial.h"
 #include "navratova_hodnota.h"
-#include "ilist.h"
-
 
 /** Enumy pro vyplneni precedencni tabulky */
 typedef enum {
@@ -68,8 +66,6 @@ tData neterminal;
 /**
  *  Hlavicky funkci
  */
-void generateInstruction( int typInstrukce, void *addr1, void *addr2, void *addr3);
-
 /** Funkce inicializuje zasobnik */
 void zasobnikInit(tZasobnik *zasobnik);
 

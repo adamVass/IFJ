@@ -129,7 +129,7 @@ tChyba htDeclInsert( tHTable *ptrht, char *key, int type, int druh ) {
 		return S_INTERNI_CHYBA;
 	}
 	new->key = malloc(strlen(key)+1);
-	new->init = false;
+
 	strcpy(new->key, key);
 	new->type = type;
 	new->druh = druh;
@@ -154,10 +154,6 @@ tChyba htDeclInsert( tHTable *ptrht, char *key, int type, int druh ) {
 
 TData* copyData( int type, TData *data )
 {
-
-	if( !data ){
-		return NULL;
-	}
 	TData *tmp = (TData*)malloc(sizeof(TData));
 
 	if( type == TYPESTR ){
