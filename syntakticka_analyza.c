@@ -441,7 +441,7 @@ tChyba PROM() {
 
 tChyba VESTAV() {
 	TItem *pt;
-	if(!strcmp(token.data, "length") && token.stav == s_klicove) {
+	if(!strcmp(token.data, "length")) {
 		pt = searchFrames(id, ptrhtGlobal, ptrhtLocal);
 		if(pt != NULL) {
 			pt->init = true;
@@ -494,7 +494,7 @@ tChyba VESTAV() {
 		}
 		return S_SYNTAKTICKA_CHYBA;
 	}
-	else if(!strcmp(token.data, "copy") && token.stav == s_klicove) {
+	else if(!strcmp(token.data, "copy")) {
 		pt = searchFrames(id, ptrhtGlobal, ptrhtLocal);
 		if(pt != NULL) {
 			pt->init = true;
@@ -502,6 +502,7 @@ tChyba VESTAV() {
 		else {
 			return S_SEMANTICKA_CHYBA_NEDEF;
 		}
+
 
 		token = getNextToken();
 		if(token.stav == s_lex_error) {
@@ -531,12 +532,13 @@ tChyba VESTAV() {
 						return S_SEMANTICKA_CHYBA_NEDEF;
 				}
 
+
 				token = getNextToken();
 				if(token.stav == s_lex_error) {
 					return S_LEXIKALNI_CHYBA;
 				}
 
-				else if(token.stav == s_strednik) {
+				else if(token.stav == s_carka) {
 					token = getNextToken();
 					if(token.stav == s_lex_error) {
 						return S_LEXIKALNI_CHYBA;
@@ -564,7 +566,7 @@ tChyba VESTAV() {
 							return S_LEXIKALNI_CHYBA;
 						}
 
-						else if(token.stav == s_strednik) {
+						else if(token.stav == s_carka) {
 							token = getNextToken();
 							if(token.stav == s_lex_error) {
 								return S_LEXIKALNI_CHYBA;
@@ -649,7 +651,7 @@ tChyba VESTAV() {
 					return S_LEXIKALNI_CHYBA;
 				}
 
-				else if(token.stav == s_strednik) {
+				else if(token.stav == s_carka) {
 					token = getNextToken();
 					if(token.stav == s_lex_error) {
 						return S_LEXIKALNI_CHYBA;
@@ -856,7 +858,7 @@ tChyba ROZHODNI() {
 		return S_BEZ_CHYB;
 	}
 	else {
-		
+			
 		analyza2 = VESTAV();
 		if(analyza2 != S_BEZ_CHYB && analyza2 != S_EPS) {
 			return analyza2;
@@ -1155,14 +1157,6 @@ tChyba ACT_LIST() {
 		return S_SYNTAKTICKA_CHYBA;
 	}
 	else if(!strcmp(token.data, "readln") && token.stav == s_klicove) {
-		pt = searchFrames(id, ptrhtGlobal, ptrhtLocal);
-		if(pt != NULL) {
-			pt->init = true;
-		}
-		else {
-			return S_SEMANTICKA_CHYBA_NEDEF;
-		}
-
 		token = getNextToken();
 		if(token.stav == s_lex_error) {
 			return S_LEXIKALNI_CHYBA;
@@ -1180,14 +1174,11 @@ tChyba ACT_LIST() {
 					return S_SEMANTICKA_CHYBA_NEDEF;
 				}
 
-				if(pt->init == false) {
-					return S_NEINICIALIZOVANA_PROMENNA;
-				}
-
 				if(pt->type == TYPEBOOL) {
 					return S_SEMANTICKA_CHYBA_TYPOVA;
 				}
 
+				pt->init = true;		//pokud nalezeneme v hash tabulce nastavime inicializaci na true
 				token = getNextToken();
 				if(token.stav == s_lex_error) {
 					return S_LEXIKALNI_CHYBA;
@@ -1333,7 +1324,7 @@ tChyba TERM() {
 			return analyza;
 		}
 
-		if(bylo_id == true) {
+		if(token.stav == s_identifikator) {
 			pt = searchFrames(token.data, ptrhtLocal, ptrhtGlobal);
 			if(pt != NULL) {
 				if(pt->init == false) {
@@ -1343,7 +1334,7 @@ tChyba TERM() {
 			else {
 				return S_SEMANTICKA_CHYBA_NEDEF;
 			}
-			bylo_id = false;
+			
 		}
 
 		token = getNextToken();
@@ -1364,7 +1355,7 @@ tChyba TERM() {
 				return analyza;
 			}
 
-			if(bylo_id == true) {
+			if(token.stav == s_identifikator) {
 				pt = searchFrames(token.data, ptrhtLocal, ptrhtGlobal);
 				if(pt != NULL) {
 					if(pt->init == false) {
@@ -1374,7 +1365,7 @@ tChyba TERM() {
 				else {
 					return S_SEMANTICKA_CHYBA_NEDEF;
 				}
-				bylo_id = false;
+				
 			}
 
 			token = getNextToken();
@@ -1425,7 +1416,7 @@ tChyba TERM2() {
 		}
 
 		pt = htSearch(ptrhtGlobal, funkce);
-		if(bylo_id == true) {		//pokud to bylo id
+		if(token.stav == s_identifikator) {		//pokud to bylo id
 			if(pt != NULL) {
 				for (int i = 0; i < pt->data->param.numParam; ++i){			//prochazime pole parametru
 					if(!strcmp(token.data, pt->data->param.param[i])) {		//pokud najdeme parametr tak nastavime na true
@@ -1454,7 +1445,7 @@ tChyba TERM2() {
 			else {
 				return S_SEMANTICKA_CHYBA_NEDEF;
 			}			
-			bylo_id = false;
+			
 			nasel = false;
 		}
 		else {
@@ -1505,7 +1496,7 @@ tChyba TERM2() {
 			}
 
 			pt = htSearch(ptrhtGlobal, porovnani);
-			if(bylo_id == true) {
+			if(token.stav == s_identifikator) {
 				if(pt != NULL) {	
 					for (int i = 0; i < pt->data->param.numParam; ++i){
 						if(!strcmp(token.data, pt->data->param.param[i])) {
@@ -1534,7 +1525,7 @@ tChyba TERM2() {
 				else {
 					return S_SEMANTICKA_CHYBA_NEDEF;
 				}			
-				bylo_id = false;
+				
 				nasel = false;
 			}
 			else {
@@ -1582,7 +1573,7 @@ tChyba DRUH() {
 	}
 	else if(token.stav == s_identifikator) {
 		
-		bylo_id = true;				//zapamatujeme si, ze bylo zadano id
+					//zapamatujeme si, ze bylo zadano id
 		return S_BEZ_CHYB;
 	}
 		
