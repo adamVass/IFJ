@@ -32,6 +32,7 @@ tChyba initFunction()
 	}
 	for (int i = 0; i < funcSize; ++i){
 		func[i].key = NULL;
+		InitList( &(func[i].instrList) );
 		func[i].table = NULL;
 	}
 	return S_BEZ_CHYB;
@@ -47,8 +48,7 @@ tChyba initTable()
 		return S_INTERNI_CHYBA;
 	}
 	for (int i = 0; i < fieldSize; ++i){
-		ptrTables[i].field = NULL;
-		ptrTables[i].table = NULL;
+		ptrTables[i].stackItem = NULL;
 	}
 	return S_BEZ_CHYB;
 }
@@ -66,6 +66,7 @@ tChyba initStack()
 		return S_INTERNI_CHYBA;
 	}
 	ptrStack->top->lower = NULL;
+	InitList( &(ptrStack->top->field) );
 	//vytvoreni ht
 	int ret = htInit( &ptrhtLocal );
 	if( ret != S_BEZ_CHYB ){
@@ -91,6 +92,19 @@ tChyba pushFrame()
 	}
 	//prirazeni ht do ramce
 	tmp->ptrht = ptrhtLocal;
+		//uchovani ukazatele do TableFields
+	if( currentSize == fieldSize ){
+		int ret = resizeTableField();
+		if( ret == S_INTERNI_CHYBA ){
+			return ret;
+		}
+	}
+	//pridani ramce do pole tabulek
+	ptrTables[currentSize].stackItem = tmp;
+	//vytvoreni listu instrukci pro ramec
+	InitList(&(ptrTables[currentSize].stackItem->field));
+	listIntrukci = ptrTables[currentSize++].stackItem->field;
+
 	//prirazeni vrcholu zasobniku pod novy ramec
 	tmp->lower = ptrStack->top;
 	//ptr na posledni lokalni ramec
@@ -104,15 +118,6 @@ tChyba pushFrame()
 //maze ramec ze zasobniku a do frame predava ukazatel na dalsi ramec do ptrhtLocal
 tChyba popFrame()
 {
-	//uchovani ukazatele do TableFields
-	if( currentSize == fieldSize ){
-		int ret = resizeTableField();
-		if( ret == S_INTERNI_CHYBA ){
-			return ret;
-		}
-	}
-	//pridani odebiraneho ramce do pole tabulek
-	ptrTables[currentSize++].table = ptrStack->top->ptrht;
 	//posunuti vrcholu
 	ptrStack->top = ptrStack->top->lower;
 	//nova ht v local ukazateli
@@ -173,6 +178,17 @@ tChyba copyTable( tHTable *source, tHTable *dest )
 		}
 	}
 	return S_BEZ_CHYB;
+}
+
+tHTable* searchFuncTable( char *key )
+{
+	for (int i = 0; i < currFuncSize; ++i){
+		if(  !strcmp( key, func[i].key ) ){
+			return func[i].table;
+		}
+		 
+	}
+	return NULL;
 }
 
 

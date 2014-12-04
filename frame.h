@@ -9,10 +9,12 @@ typedef struct TFunction
 {
 	char *key;
 	tHTable *table;
+	tList instrList;
 }TFunction;
 
 typedef struct TStackItem{
 	tHTable *ptrht;
+	tList field;	//pole instrukci...
 	struct TStackItem *lower;
 }TStackItem;
 
@@ -21,8 +23,7 @@ typedef struct TStack{
 } TStack;
 
 typedef struct TTableField{
-	tHTable *table;	//frame
-	tList *field;	//pole instrukci...
+	TStackItem *stackItem;
 }TTableField;
 
 TStack *ptrStack;
@@ -50,6 +51,9 @@ tChyba resizeTableField();
 tChyba resizeFuncField();
 
 tChyba copyTable( tHTable *source, tHTable *dest );
+
+tHTable* searchFuncTable( char *key );
+
 
 
 #endif
