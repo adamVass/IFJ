@@ -13,6 +13,46 @@
 #include "mystring.h"
 #include "frame.h"
 
+/*TItem* UNDEFPTR;
+
+void htPrintTable() {
+    int maxlen = 0;
+    int sumcnt = 0;
+    printf ("------------HASH TABLE--------------\n");
+
+    for ( int i=0; i<HTSIZE; i++ ) {
+        printf ("%i:",i);
+        int cnt = 0;
+        TItem* ptr = (*ptrhtGlobal)[i];
+
+        while ( ptr != NULL ) {
+            printf (" (%s)",ptr->key); // vytiskne klic
+            if( ptr->type == 0 ){ // string
+                printf(" %s", ptr->data.str);
+            }
+            else if( ptr->type == 1 ){ // bool
+                printf(" %d", ptr->data.boolValue);
+            }
+            else if( ptr->type == 2 ){ // int
+                printf(" %d", ptr->data.intNumber);
+            }
+            else if( ptr->type == 3 ){ // double
+                printf(" %f", ptr->data.floatNumber);
+            }
+            if ( ptr != UNDEFPTR )
+                cnt++;
+            ptr = ptr->ptrnext;
+        }
+        printf ("\n");
+        if (cnt > maxlen)
+            maxlen = cnt;
+        sumcnt+=cnt;
+    }
+    printf ("------------------------------------\n");
+    printf ("Items count %i The longest list %i\n",sumcnt,maxlen);
+    printf ("------------------------------------\n");
+}*/
+
 #define VELIKOST_TABULKY 14
 
 tZahlavi precedencniTabulka [VELIKOST_TABULKY][VELIKOST_TABULKY] = {
@@ -52,7 +92,7 @@ void generateVariable(tToken *var) {
 }
 
 /** Funkce vlozi instrukci do seznamu instrukci */
-void generateInstruction(int typInstrukce, void *addr1, void *addr2, void *addr3) {
+void generateInstruction( int typInstrukce, void *addr1, void *addr2, void *addr3) {
    tInst I;
    I.instructionType = typInstrukce;
    I.address1 = addr1;
@@ -142,7 +182,7 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
             prevedenyToken->symbol = ID;
             prevedenyToken->polozkaTS.key = tmp->key;
             prevedenyToken->polozkaTS.type = tmp->type;
-            prevedenyToken->polozkaTS.data = copyData( tmp->type, tmp->data);
+            prevedenyToken->polozkaTS.data = tmp->data;
             prevedenyToken->polozkaTS.ptrnext = tmp->ptrnext;
         }
     }
@@ -402,7 +442,7 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
                         htInsert(ptrhtLocal, neterminal.polozkaTS.key, copyData( neterminal.polozkaTS.type, neterminal.polozkaTS.data ), neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
 
                         /** Vlozeni instrukce do seznamu */
-                        generateInstruction(operace, htSearch(ptrhtLocal, prectiTerminal.polozkaTS.key), htSearch(ptrhtLocal, prectiTerminal3.polozkaTS.key), htSearch(ptrhtLocal, neterminal.polozkaTS.key));
+                        generateInstruction(  operace, htSearch(ptrhtLocal, prectiTerminal.polozkaTS.key), htSearch(ptrhtLocal, prectiTerminal3.polozkaTS.key), htSearch(ptrhtLocal, neterminal.polozkaTS.key));
                         return S_BEZ_CHYB;
                     }
 
@@ -420,7 +460,7 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
                         htInsert(ptrhtLocal, neterminal.polozkaTS.key, copyData( neterminal.polozkaTS.type, neterminal.polozkaTS.data ), neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
 
                         /** Vlozeni instrukce do seznamu */
-                        generateInstruction(operace, htSearch(ptrhtLocal, prectiTerminal.polozkaTS.key), htSearch(ptrhtLocal, prectiTerminal3.polozkaTS.key), htSearch(ptrhtLocal, neterminal.polozkaTS.key));
+                        generateInstruction( operace, htSearch(ptrhtLocal, prectiTerminal.polozkaTS.key), htSearch(ptrhtLocal, prectiTerminal3.polozkaTS.key), htSearch(ptrhtLocal, neterminal.polozkaTS.key));
                         return S_BEZ_CHYB;
                     }
                 }
@@ -439,6 +479,7 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
 }
 
 tChyba precedencniSA() {
+
     int precti = 1;
     tChyba navrat;
     tData dolar;
