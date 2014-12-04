@@ -10,35 +10,40 @@
 #include "ilist.h"
 #include "precedencni_analyza.h"
 #include "interpret.h"
-//#include "syntakticka_analyza.h"
-
+#include "syntakticka_analyza.h"
 
 void printdata( TItem *tmp ){
-    if( tmp->type == 0 ){
-        printf("retezec: %s\n", tmp->data->str );
+    if( tmp->type == TYPESTR ){
+        fprintf(stderr, "retezec: %s\n", tmp->data->str );
     }
-	else if( tmp->type == 1 ){
-        printf("boolean: %s\n", tmp->data->boolValue ? "true" : "false");
+	else if( tmp->type == TYPEBOOL ){
+        fprintf(stderr, "boolean: %s\n", tmp->data->boolValue ? "true" : "false");
     }
-    else if( tmp->type == 2 ){
-        printf("integer: %d\n", tmp->data->intNumber );
+    else if( tmp->type == TYPEINT ){
+        fprintf(stderr, "integer: %d\n", tmp->data->intNumber );
     }
-    else if( tmp->type == 3 ){
-        printf("double: %lf\n", tmp->data->floatNumber );
+    else if( tmp->type == TYPEDOUBLE ){
+        fprintf(stderr, "double: %lf\n", tmp->data->floatNumber );
     }
 }
 
 void printList () {
-    while (listIntrukci.First != NULL) {
+    listIntrukci.Active = listIntrukci.First;
 
-        printf("V listu je operace %d\n", listIntrukci.First->instruction.instructionType);
-        printf("Operand 1\n");
-        TItem *tmp = (TItem*)listIntrukci.First->instruction.address1;
-        printdata(tmp);
-        printf("Operand 2\n");
-        tmp = (TItem*)listIntrukci.First->instruction.address2;
-        printdata(tmp);
-        listIntrukci.First = listIntrukci.First->nextItem;
+    while (listIntrukci.Active != NULL) {
+        fprintf(stderr, "V listu je operace %d\n", listIntrukci.Active->instruction.instructionType);
+        TItem *tmp = (TItem*)listIntrukci.Active->instruction.address1;
+        if (tmp != NULL) {
+            fprintf(stderr, "Operand 1\t");
+            printdata(tmp);
+        }
+        tmp = (TItem*)listIntrukci.Active->instruction.address2;
+        if (tmp != NULL){
+            fprintf(stderr, "Operand 2\t");
+            printdata(tmp);
+        }
+        /** Pristup k dalsimu prvku seznamu */
+        listIntrukci.Active = listIntrukci.Active->nextItem;
     }
 }
 
@@ -57,6 +62,7 @@ int main (int argc, char *argv[]) {
     }
     setSourceFile(f);
 
+// -----------------------------------------------------------------------------------------------------
     /** Test lexikalniho analyzatoru */
     /*tToken navrat;
     tokenInit(&token);
@@ -66,48 +72,72 @@ int main (int argc, char *argv[]) {
         stav = navrat.stav;
         printf("%d:\t%s\n", navrat.stav, navrat.data);
     }*/
+// -----------------------------------------------------------------------------------------------------
 
-    /** Tabulka symbolu */
+    /** Tabulky symbolu */
     htInit(&ptrhtLocal);
 	htInit(&ptrhtGlobal);
 
     /** Seznam instrukci */
     InitList (&listIntrukci);
 
-    int navrat;
+
+
+    /** Zkouska instrukce prirazeni */
+    /*  1. operand co se ma priradit, 2. operand NULL,
+        3. operand vysledek, tzn. kam se ma priradit */
+    /*  Je potreba pridat do globalni tabulky polozku promenne,
+        do ktere se bude prirazovat napr. vysledek vyrazu */
+
+	TData *datavysl = malloc(sizeof(TData));
+	htInsert(ptrhtGlobal, "vysledek", datavysl, TYPEBOOL, ID_GLOBAL);
+    //htPrintTable(ptrhtGlobal);
+
+
+    /** Test precedencni analyzy*/
+    /*int navrat;
     tokenInit(&token);
     token = getNextToken();
     navrat = precedencniSA();
     if (navrat == S_BEZ_CHYB)
-        printf("Syntakticka analyza OK\n");
+        fprintf(stderr, "Syntakticka analyza OK\n");
     else
-        printf("Syntakticka analyza NO\n");
+        fprintf(stderr, "Syntakticka analyza NO\n");*/
 
-    //printList();
+    //generateInstruction(OC_PRIRAZENI, htSearch(ptrhtLocal, neterminal.polozkaTS.key), NULL, htSearch(ptrhtGlobal, "vysledek"));
+    generateInstruction(OC_READ, NULL, NULL, htSearch(ptrhtGlobal, "vysledek"));
 
     tChyba navr_kod = interpret();
-    printf("Navratovy kod interpretu: %d\n", navr_kod);
+    fprintf(stderr, "Navratovy kod interpretu: %d\n", navr_kod);
 
+    /** Vytisk seznamu instrukci */
+    //printList();
+
+    TItem *tmp = htSearch(ptrhtGlobal, "vysledek");
+    if (tmp != NULL) {
+        printdata(tmp);
+    }
+
+
+// -----------------------------------------------------------------------------------------------------
         /** Takto se pristupuje k vysledku vyrazu */
-        TItem *vysledek = htSearch(ptrhtLocal, neterminal.polozkaTS.key);
+    TItem *vysledek = htSearch(ptrhtLocal, neterminal.polozkaTS.key);
 
-if (vysledek != NULL) {
-	if (vysledek->type == TYPEINT) {
-            printf("Vysledek typu int %d\n", vysledek->data->intNumber);
-        }
+    if (vysledek != NULL) {
+        if (vysledek->type == TYPEINT) {
+                printf("Vysledek typu int %d\n", vysledek->data->intNumber);
+            }
         else if (vysledek->type == TYPEBOOL) {
             printf("Vysledek typu boolean %s\n", vysledek->data->boolValue ? "true" : "false");
         }
         else if (vysledek->type == TYPEDOUBLE) {
             printf("Vysledek typu double %lf\n", vysledek->data->floatNumber);
         }
-}
-        
+    }
+// -----------------------------------------------------------------------------------------------------
 
-
-
-
-    /*int navrat;
+    /* Syntakticka analyza
+    int navrat;
     navrat = syntakticka_anal();
     if(navrat == S_BEZ_CHYB)
         fprintf(stderr, "SYN OK\n");
@@ -115,7 +145,6 @@ if (vysledek != NULL) {
         fprintf(stderr, "SYN NO\n");
 
 	fprintf(stderr, "Navratova hodnota parseru: %d\n", navrat);*/
-
 
     return 0;
 }
