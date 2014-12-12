@@ -6,19 +6,58 @@
 /****************************************/
 
 #include "interpret.h"
+#include "frame.h"
 
 
 tChyba interpret() {
 
-    listIntrukci.Active = listIntrukci.First;
+    //pro meneni listu instrukci v poli pri call a return
+    int label = 0;
+    //nastaveni prvniho listu - fce main
+    listIntrukci = &(ptrTables[label].stackItem->field);
+    bool *labelField = (bool*)malloc(sizeof(bool)*currentSize);
+    for (int i = 0; i < currentSize; ++i)
+        labelField[i] = true;
+    bool vysledekCopy = false;
+    bool jump = true;
+    char *mezivysledekCopy;
 
-    while (listIntrukci.Active != NULL) {
+    listIntrukci->Active = listIntrukci->First;
+    //printf("%d\n", currentSize );
 
-        TItem *tmp1 = (TItem*)listIntrukci.Active->instruction.address1;
-        TItem *tmp2 = (TItem*)listIntrukci.Active->instruction.address2;
-        TItem *tmp3 = (TItem*)listIntrukci.Active->instruction.address3;
+    while (listIntrukci->Active != NULL) {
 
-        switch(listIntrukci.Active->instruction.instructionType) {
+        TItem *tmp1 = (TItem*)listIntrukci->Active->instruction.address1;
+        TItem *tmp2 = (TItem*)listIntrukci->Active->instruction.address2;
+        TItem *tmp3 = (TItem*)listIntrukci->Active->instruction.address3;
+
+        //printf("%d\n", listIntrukci->Active->instruction.instructionType);
+
+        switch(listIntrukci->Active->instruction.instructionType) {
+            case OC_CPY:
+                tmp1->data = copyData( tmp1->type, tmp1->data );
+                tmp1->init = true;
+                break;
+
+            case OC_RET:
+                labelField[label] = false;
+                do{
+                    label--;
+                }while(!labelField[label]);
+                //printf("\nlabel%d\n", label);
+                listIntrukci = &(ptrTables[label].stackItem->field);
+
+                break;
+            case OC_CALL:
+                    //posunuti,abychom se nezacyklili volanim funkce porad dokola, az se budem vracet
+                do{
+                    label++;
+                }while(!labelField[label] );
+                //printf("\nlabel%d\n", label);
+                listIntrukci = &(ptrTables[label].stackItem->field);
+                listIntrukci->Active = listIntrukci->First;
+                jump = false;
+                break;
 
             /** Aritmeticke instrukce */
                 /** Instrukce scitani */
@@ -75,6 +114,7 @@ tChyba interpret() {
 
                 /** Instrukce nasobeni */
             case OC_MUL:
+            
                 if (tmp1->type == TYPEINT && tmp2->type == TYPEINT) {
                     tmp3->data->intNumber = tmp1->data->intNumber * tmp2->data->intNumber;
                     //printf("Nasobeni: operand1 %d, operand2 %d\n", tmp1->data.intNumber, tmp2->data.intNumber);
@@ -399,19 +439,15 @@ tChyba interpret() {
                 break;
 
             case OC_PRIRAZENI:
-                if (tmp1->type == tmp3->type) {
-                    if (tmp1->type == TYPEINT) {
-                        tmp3->data->intNumber = tmp1->data->intNumber;
+                if( !tmp1->init ){
+                    return S_NEINICIALIZOVANA_PROMENNA;
+                }
+                if (tmp1->type == tmp3->type) {////////////////////////////////////////////
+                    if (tmp1->type == TYPESTR) {///////////////////////////////
+                        tmp3->data->str = allocString(tmp1->data->str);////////////////////////////////
                     }
-                    else if (tmp1->type == TYPEDOUBLE) {
-                        tmp3->data->floatNumber = tmp1->data->floatNumber;
-                    }
-                    else if (tmp1->type == TYPEBOOL) {
-                        tmp3->data->boolValue = tmp1->data->boolValue;
-                    }
-                    else if (tmp1->type == TYPESTR) {
-                        tmp3->data->str = tmp1->data->str;
-                    }
+                    else *tmp3->data = *tmp1->data;///////////////////////
+                    tmp3->init = true;
                 }
                 else {
                     return S_SEMANTICKA_CHYBA_TYPOVA;
@@ -439,6 +475,9 @@ tChyba interpret() {
                 break;
 
             case OC_WRITE:
+                if( !tmp1->init ) {
+                    return S_NEINICIALIZOVANA_PROMENNA;
+                }
                 if (tmp1->type == TYPEINT) {
                     printf("%d", tmp1->data->intNumber);
                 }
@@ -451,13 +490,81 @@ tChyba interpret() {
                 else if (tmp1->type == TYPESTR) {
                     printf("%s", tmp1->data->str);
                 }
+                if( tmp1->druh == DRUHDOCAS ){//////////////////////////////////////////////////////////////////////
+                    free(tmp1->data->str);//////////////////////////////////////////////////////////
+                    free(tmp1->data);//////////////////////////////////////////////////////////
+                    free(tmp1);//////////////////////////////////////////////////////////////////////////////////
+                }///////////////////////////////////////////////////////////////////////////////////////////////////
+                break;
+
+
+            case OC_LENGTH:
+                if (tmp1->type == TYPESTR) {
+                    tmp3->type = TYPEINT;
+                    tmp3->data->intNumber = strLength(tmp1->data->str);
+                    tmp3->init = true;
+                }
+                else {
+                    fprintf(stderr, "Funkce length ma jeden parametr a to typu char*\n");
+                    return S_SEMANTICKA_CHYBA_TYPOVA;
+                }
+                break;
+
+            case OC_COPY:
+                // ulozeni vraceneho podretezce
+                if (vysledekCopy == false) {
+                    if (tmp1->type == TYPESTR && (tmp2->type == TYPEINT && tmp2->data->intNumber > 0) && (tmp3->type == TYPEINT && tmp3->data->intNumber)) {
+                        mezivysledekCopy = malloc(strlen(tmp1->data->str + 1));
+                        mezivysledekCopy = strCopy(tmp1->data->str, tmp2->data->intNumber, tmp3->data->intNumber);
+                        vysledekCopy = true;
+
+                    }
+                    else {
+                        fprintf(stderr, "Spatne zadane parametry funkci copy\n");
+                        return S_SEMANTICKA_CHYBA_TYPOVA;
+                    }
+                }
+                // vraceni ulozeneho podretezce, instrukce OC_COPY ma jine parametry
+                else if (vysledekCopy == true) {
+                    //fprintf(stderr, "Ulozeni podretezce\n");
+                    tmp3->type = TYPESTR;
+                    tmp3->data->str = mezivysledekCopy;
+                    tmp3->init = true;
+                    vysledekCopy = false;
+                }
+
+                break;
+
+            case OC_SORT:
+                if (tmp1->type == TYPESTR) {
+                    tmp3->type = TYPESTR;
+                    tmp3->data->str = strSort(tmp1->data->str);
+                    tmp3->init = true;
+                }
+                else {
+                    fprintf(stderr, "Funkce sort ocekava jako parametr term typu char*\n");
+                    return S_SEMANTICKA_CHYBA_TYPOVA;
+                }
+                break;
+
+            case OC_FIND:
+                if (tmp1->type == TYPESTR && tmp2->type == TYPESTR) {
+                    tmp3->type = TYPEINT;
+                    tmp3->data->intNumber = kmp(tmp1->data->str, tmp2->data->str);
+                    tmp3->init = true;
+                }
+                else {
+                    fprintf(stderr, "Funkce find ocekava dva parametry typu char*\n");
+                    return S_SEMANTICKA_CHYBA_TYPOVA;
+                }
                 break;
         }
 
 
-
         /** Posun na dalsi instrukci */
-        listIntrukci.Active = listIntrukci.Active->nextItem;
+        if(jump){
+            listIntrukci->Active = listIntrukci->Active->nextItem;
+        } else jump = true;
     }
 
     return S_BEZ_CHYB;
