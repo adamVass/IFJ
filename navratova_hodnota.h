@@ -24,7 +24,4 @@ typedef enum {
     S_EPS
 } tChyba;
 
-/** Globalni promenna pro navratovy kod */
-extern tChyba navratovy_kod;
-
 #endif

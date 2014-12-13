@@ -13,46 +13,6 @@
 #include "mystring.h"
 #include "frame.h"
 
-/*TItem* UNDEFPTR;
-
-void htPrintTable() {
-    int maxlen = 0;
-    int sumcnt = 0;
-    printf ("------------HASH TABLE--------------\n");
-
-    for ( int i=0; i<HTSIZE; i++ ) {
-        printf ("%i:",i);
-        int cnt = 0;
-        TItem* ptr = (*ptrhtGlobal)[i];
-
-        while ( ptr != NULL ) {
-            printf (" (%s)",ptr->key); // vytiskne klic
-            if( ptr->type == 0 ){ // string
-                printf(" %s", ptr->data.str);
-            }
-            else if( ptr->type == 1 ){ // bool
-                printf(" %d", ptr->data.boolValue);
-            }
-            else if( ptr->type == 2 ){ // int
-                printf(" %d", ptr->data.intNumber);
-            }
-            else if( ptr->type == 3 ){ // double
-                printf(" %f", ptr->data.floatNumber);
-            }
-            if ( ptr != UNDEFPTR )
-                cnt++;
-            ptr = ptr->ptrnext;
-        }
-        printf ("\n");
-        if (cnt > maxlen)
-            maxlen = cnt;
-        sumcnt+=cnt;
-    }
-    printf ("------------------------------------\n");
-    printf ("Items count %i The longest list %i\n",sumcnt,maxlen);
-    printf ("------------------------------------\n");
-}*/
-
 #define VELIKOST_TABULKY 14
 
 tZahlavi precedencniTabulka [VELIKOST_TABULKY][VELIKOST_TABULKY] = {
@@ -92,13 +52,23 @@ void generateVariable(tToken *var) {
 }
 
 /** Funkce vlozi instrukci do seznamu instrukci */
+void generateCopyInstr( int typInstrukce, void *addr1, void *addr2, void *addr3) {
+   tInst I;
+   I.instructionType = typInstrukce;
+   I.address1 = addr1;
+   I.address2 = addr2;
+   I.address3 = addr3;
+   InsertFirst(I);
+}
+
+/** Funkce vlozi instrukci do seznamu instrukci */
 void generateInstruction( int typInstrukce, void *addr1, void *addr2, void *addr3) {
    tInst I;
    I.instructionType = typInstrukce;
    I.address1 = addr1;
    I.address2 = addr2;
    I.address3 = addr3;
-   InsertLast(&listIntrukci, I);
+   InsertLast(I);
 }
 
 void zasobnikInit(tZasobnik *zasobnik) {
@@ -179,6 +149,8 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
             fprintf(stderr, "Nedeklarovana promenna\n");
             return S_SEMANTICKA_CHYBA_NEDEF;
         } else {
+            //prevedenyToken->polozkaTS.key = allocString(tmp->key);
+            //prevedenyToken->polozkaTS.data = tmp->data;
             prevedenyToken->symbol = ID;
             prevedenyToken->polozkaTS.key = tmp->key;
             prevedenyToken->polozkaTS.type = tmp->type;
@@ -217,7 +189,6 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
 
         /** Existenci v TS resit nemusime, protoze promenna ma unikatni nazev */
         htInsert(ptrhtLocal, prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
-
     }
     else if (token.stav == s_string) {
     // **************************************************************************************
@@ -231,7 +202,6 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
         prevedenyToken->polozkaTS.data = (TData*)malloc(sizeof(TData));
         prevedenyToken->polozkaTS.data->str = allocString(token.data);
         htInsert(ptrhtLocal, prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
-
     }
     else if (token.stav == s_cele_cislo) {
 	// **************************************************************************************
@@ -245,9 +215,7 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
         prevedenyToken->polozkaTS.druh = 0;
         prevedenyToken->polozkaTS.data = (TData*)malloc(sizeof(TData));
         prevedenyToken->polozkaTS.data->intNumber = atoi(token.data);
-
         htInsert(ptrhtLocal, prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
-
 	}
     else if (token.stav == s_desetinne_cislo) {
 	// **************************************************************************************
@@ -260,9 +228,7 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
         prevedenyToken->polozkaTS.druh = 0;
         prevedenyToken->polozkaTS.data = (TData*)malloc(sizeof(TData));
         prevedenyToken->polozkaTS.data->floatNumber = atof(token.data);
-
         htInsert(ptrhtLocal, prevedenyToken->polozkaTS.key, prevedenyToken->polozkaTS.data, prevedenyToken->polozkaTS.type, prevedenyToken->polozkaTS.druh);
-
 	}
     else if (token.stav == s_strednik)
         prevedenyToken->symbol = DOLAR;
@@ -272,7 +238,6 @@ tChyba prevedToken(tToken token, tData *prevedenyToken) {
         prevedenyToken->symbol = CHYBA;
         return S_SYNTAKTICKA_CHYBA;
     }
-
     return S_BEZ_CHYB;
 }
 
@@ -407,8 +372,8 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
                     (prectiTerminal2.symbol == MENSI) || (prectiTerminal2.symbol == VETSI) || (prectiTerminal2.symbol == MENSIROVNO) ||
                     (prectiTerminal2.symbol == VETSIROVNO) || (prectiTerminal2.symbol == ROVNO) || (prectiTerminal2.symbol == NEROVNO)) {
 
-                            /** Zjisteni operatoru */
-                        operace = zjistiOperator(prectiTerminal2.symbol);
+                    /** Zjisteni operatoru */
+                operace = zjistiOperator(prectiTerminal2.symbol);
             }
             else {
                 fprintf(stderr, "Spatny operator\n");
@@ -429,25 +394,9 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
                 if (zasobnikEmpty(zasobnik2)) {
                     zasobnikPop(zasobnik1);     // odstraneni < zarazky
 
-                        /** Vygenerovani instrukce pro aritmeticke operatory */
-                    if ((operace == OC_ADD) || (operace == OC_SUB) || (operace == OC_MUL) || (operace == OC_DIV)) {
-
-                        generateVariable(&newVar);
-                        neterminal.polozkaTS.key = allocString(newVar.data);
-                        neterminal.symbol = NETERMINAL;
-
-                        zasobnikPush(zasobnik1, neterminal);
-
-                        /** Vlozeni do TS */
-                        htInsert(ptrhtLocal, neterminal.polozkaTS.key, copyData( neterminal.polozkaTS.type, neterminal.polozkaTS.data ), neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
-
-                        /** Vlozeni instrukce do seznamu */
-                        generateInstruction(  operace, htSearch(ptrhtLocal, prectiTerminal.polozkaTS.key), htSearch(ptrhtLocal, prectiTerminal3.polozkaTS.key), htSearch(ptrhtLocal, neterminal.polozkaTS.key));
-                        return S_BEZ_CHYB;
-                    }
-
-                        /** Vygenerovani instrukce pro relacni operatory */
-                    else if ((operace == OC_MENSI) || (operace == OC_VETSI) || (operace == OC_MENSI_ROVNO) ||
+                        /** Vygenerovani instrukce pro aritmeticke a relacni operatory */
+                    if ((operace == OC_ADD) || (operace == OC_SUB) || (operace == OC_MUL) || (operace == OC_DIV) ||
+                        (operace == OC_MENSI) || (operace == OC_VETSI) || (operace == OC_MENSI_ROVNO) ||
                         (operace == OC_VETSI_ROVNO) || (operace == OC_ROVNO) || (operace == OC_NEROVNO)) {
 
                         generateVariable(&newVar);
@@ -457,10 +406,13 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
                         zasobnikPush(zasobnik1, neterminal);
 
                         /** Vlozeni do TS */
-                        htInsert(ptrhtLocal, neterminal.polozkaTS.key, copyData( neterminal.polozkaTS.type, neterminal.polozkaTS.data ), neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
+                        htInsert(ptrhtLocal, neterminal.polozkaTS.key, copyData(neterminal.polozkaTS.type, neterminal.polozkaTS.data),
+                                             neterminal.polozkaTS.type, neterminal.polozkaTS.druh);
 
                         /** Vlozeni instrukce do seznamu */
-                        generateInstruction( operace, htSearch(ptrhtLocal, prectiTerminal.polozkaTS.key), htSearch(ptrhtLocal, prectiTerminal3.polozkaTS.key), htSearch(ptrhtLocal, neterminal.polozkaTS.key));
+                        generateInstruction(operace, searchFrames(prectiTerminal.polozkaTS.key, ptrhtLocal, ptrhtGlobal),
+                                                     searchFrames(prectiTerminal3.polozkaTS.key, ptrhtLocal, ptrhtGlobal),
+                                                     searchFrames(neterminal.polozkaTS.key, ptrhtLocal, ptrhtGlobal));
                         return S_BEZ_CHYB;
                     }
                 }
@@ -479,12 +431,11 @@ tChyba redukuj(tZasobnik *zasobnik1, tZasobnik *zasobnik2) {
 }
 
 tChyba precedencniSA() {
-
-    int precti = 1;
+    bool precti = true;
     tChyba navrat;
     tData dolar;
     tPrecTabulka akce;
-    tData prevedenyToken = { .symbol = 0 };
+    tData prevedenyToken = {.symbol = 0};
     tData nejvrchTermSymbol;
     tData zarazka;
     zarazka.symbol = ZARAZKA;
@@ -502,10 +453,10 @@ tChyba precedencniSA() {
     zasobnikPush(&zasobnik1, dolar);
 
     /** Dokud aktualni vstupni symbol a nejvrchnejsi terminalni symbol neni dolar, proved dalsi smycku */
-    while (!((prevedenyToken.symbol == DOLAR) && (nejvrchTermSymbol.symbol == DOLAR))) {
+    while (1) {
 
         /** Prvni token dostaneme od SA rekurzivniho sestupu */
-        if (precti == 1) {
+        if (precti) {
             navrat = prevedToken(token, &prevedenyToken);
             if (navrat != S_BEZ_CHYB) {
                 return navrat;
@@ -528,9 +479,8 @@ tChyba precedencniSA() {
         switch (akce) {
 
         case R:
-            //pomocna.symbol = prevedenyToken.symbol;
             zasobnikPush(&zasobnik1, prevedenyToken);
-            precti = 1;
+            precti = true;
             break;
 
         case M:
@@ -539,12 +489,12 @@ tChyba precedencniSA() {
             presypZasobnikZpet(&zasobnik2, &zasobnik1);
             /** Precteme token ze vstupu a dame na vrchol zasobniku */
             zasobnikPush(&zasobnik1, prevedenyToken);
-            precti = 1;
+            precti = true;
             break;
 
         case V:
             navrat = redukuj(&zasobnik1, &zasobnik2);
-            precti = 0;
+            precti = false;
             if (navrat == S_SYNTAKTICKA_CHYBA)
                 return S_SYNTAKTICKA_CHYBA;
             break;
@@ -560,7 +510,7 @@ tChyba precedencniSA() {
         }
 
         /** Nacteme token a prevedeme na terminalni symbol: a */
-        if (precti == 1) {
+        if (precti) {
             token = getNextToken();
         }
     }
