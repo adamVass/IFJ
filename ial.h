@@ -22,6 +22,8 @@
 #define ID_PARAM     10
 
 #define TYPEUNDEF    11
+#define DRUHDOCAS    12
+#define PRINTSTR     13
 
 #define EMPTY_STRING ""
 

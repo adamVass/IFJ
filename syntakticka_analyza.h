@@ -12,6 +12,24 @@
 #include "precedencni_analyza.h"
 #include "frame.h"
 
+tHTable *pomocna;
+int dtype;
+bool init;
+bool prirovnani;
+int pocitadlo;
+bool bylo_id;
+char* term_id;
+char* porovnani;
+char* id;
+char* funkce;
+char* params;
+tToken token;
+bool byla_funkce;
+int pocitani_parametru;
+int lab;
+int lab_while;
+
+
 //hlavicky funkci
 int syntakticka_anal();
 void htPrintTable( tHTable *ptrht );

@@ -175,6 +175,7 @@ TData* copyData( int type, TData *data )
 	else if( type == ID_FUNCTION ){
 		tmp->param.numParam = data->param.numParam;
 		//alokuju vetsi potrebne pole parametru a typu
+
 		tmp->param.param = (char**)malloc( sizeof(char*)*tmp->param.numParam );
 		tmp->param.typeParam = (int*)malloc( sizeof(int)*tmp->param.numParam );
 		for (int i = 0; i < data->param.numParam; ++i){
@@ -200,6 +201,9 @@ tChyba htInsert ( tHTable *ptrht, char *key, TData *data, int type, int druh ) {
 	new->data = data;
 	new->type = type;
 	new->druh = druh;
+	if( data ){
+		new->init = true;
+	}else new->init = false;
 	int hashKey = hashCode(key);
 	new->ptrnext = (*ptrht)[hashKey];
 	(*ptrht)[hashKey] = new;

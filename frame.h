@@ -2,8 +2,7 @@
 #define _FRAME_H_
 
 #include "ial.h"
-#include "ilist.h"
-#include "mystring.h"
+#include "syntakticka_analyza.h"
 
 typedef struct TFunction
 {
@@ -46,13 +45,18 @@ tChyba popFrame();
 
 TItem* searchFrames( char *key, tHTable *ptrLocal, tHTable *ptrGlobal );
 
+tChyba addArgument( char *key );
+
 tChyba resizeTableField();
 
 tChyba resizeFuncField();
 
-tChyba copyTable( tHTable *source, tHTable *dest );
+tChyba copyTable( TFunction *source );
 
-tHTable* searchFuncTable( char *key );
+TFunction* searchFuncTable( char *key );
+
+TData* createData( int type, char *hodnota );
+
 
 
 

@@ -68,6 +68,8 @@ tData neterminal;
 /**
  *  Hlavicky funkci
  */
+void generateCopyInstr( int typInstrukce, void *addr1, void *addr2, void *addr3);
+
 void generateInstruction( int typInstrukce, void *addr1, void *addr2, void *addr3);
 
 /** Funkce inicializuje zasobnik */

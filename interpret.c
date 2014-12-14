@@ -56,6 +56,63 @@ tChyba interpret() {
                 listIntrukci->Active = listIntrukci->First;
                 jump = false;
                 break;
+            case OC_GOTO_WHILE:
+                //loop jump?
+                if( listIntrukci->Active->nextItem->instruction.instructionType == OC_WHILE_AFTER ){
+                    //finding right OC_WHILE_PRED label
+                    listIntrukci->Active = listIntrukci->First;
+                    while( 1 ){
+                        TItem *lab = (TItem*)listIntrukci->Active->instruction.address3;
+                        if( listIntrukci->Active->instruction.instructionType == OC_WHILE_PRED
+                            && lab->data->intNumber == tmp3->data->intNumber ){
+                            break;
+                        }
+                        listIntrukci->Active = listIntrukci->Active->nextItem;
+                    }
+                }
+                // while condition
+                else if( !tmp1->data->boolValue ){
+                    //finding right OC_WHILE_AFTER label
+                    while( 1 ){
+                        TItem *lab = (TItem*)listIntrukci->Active->instruction.address3;
+                        if( listIntrukci->Active->instruction.instructionType == OC_WHILE_AFTER
+                            && lab->data->intNumber == tmp3->data->intNumber ){
+                            break;
+                        }
+                        listIntrukci->Active = listIntrukci->Active->nextItem;
+                    }
+                }
+                break;
+            case OC_GOTO:
+                if(!tmp1->data->boolValue){
+                    tItemPtr n = listIntrukci->Active;
+                    while(n){
+                        TItem *lab = (TItem*)n->instruction.address3;
+                        if( n->instruction.instructionType == OC_ELSE
+                            && lab->data->intNumber ==  tmp3->data->intNumber )
+                        {
+                            listIntrukci->Active = n;
+                            break;
+                        }
+                        n = n->nextItem;
+                    }
+                }
+                break;
+            case OC_GOTOAFTER:
+                if(1){ //declaration after statement hack
+                    tItemPtr n = listIntrukci->Active;
+                    while(n){
+                        TItem *lab = (TItem*)n->instruction.address3;
+                        if( n->instruction.instructionType == OC_AFTER_ELSE
+                            && lab->data->intNumber ==  tmp3->data->intNumber )
+                        {
+                            listIntrukci->Active = n;
+                            break;
+                        }
+                        n = n->nextItem;
+                    }
+                }
+                break;
 
             /** Aritmeticke instrukce */
                 /** Instrukce scitani */
@@ -526,18 +583,21 @@ tChyba interpret() {
 
             case OC_READ:
                 if (tmp3->type == TYPEINT) {
+                    tmp3->init = true;
                     if (scanf("%i", &(tmp3->data->intNumber)) != 1) {
                         fprintf(stderr, "Promenna je jineho typu\n");
                         return S_CHYBA_PRI_VSTUPU;
                     }
                 }
                 else if (tmp3->type == TYPEDOUBLE) {
+                    tmp3->init = true;
                     if (scanf("%lf", &(tmp3->data->floatNumber)) != 1) {
                         fprintf(stderr, "Promenna je jineho typu\n");
                         return S_CHYBA_PRI_VSTUPU;
                     }
                 }
                 else if (tmp3->type == TYPESTR) {
+                    tmp3->init = true;
                     tToken tmp;
                     int znak;
                     tokenInit(&tmp);
